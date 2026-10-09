@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel de Estoque e Pagamento da Dívida Pública | SEPLAN MA</title>
+<meta name="description" content="Dashboard web para análise do estoque e do fluxo de pagamento da dívida pública — SEPLAN MA. Atualização via planilha Excel.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230F1F3D'/><text x='50' y='68' font-size='54' text-anchor='middle' fill='%234D9BFF' font-family='Arial' font-weight='bold'>S</text></svg>">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --bg:#F4F6F9;
+  --bg-grad:radial-gradient(1200px 600px at 15% -10%, #E8EEF8 0%, transparent 60%),
+            radial-gradient(900px 500px at 100% 0%, #EAF1FB 0%, transparent 55%);
+  --card:#FFFFFF;
+  --card-2:#F8FAFC;
+  --navy:#0F1F3D;
+  --navy-2:#16294E;
+  --blue:#0B5ED7;
+  --blue-deep:#004C99;
+  --blue-soft:#EBF4FF;
+  --orange:#D96B27;
+  --orange-soft:#FDEEE4;
+  --slate:#8C96A3;
+  --slate-soft:#EEF1F5;
+  --green:#1E8E5A;
+  --green-soft:#E6F8F0;
+  --red:#C53030;
+  --red-soft:#FDE8E8;
+  --text:#1A202C;
+  --muted:#718096;
+  --border:#E2E8F0;
+  --track:#EDF1F6;
+  --shadow:0 4px 6px -1px rgba(16,32,64,.05), 0 2px 4px -1px rgba(16,32,64,.03);
+  --shadow-lg:0 18px 40px -18px rgba(16,32,64,.22), 0 2px 8px -2px rgba(16,32,64,.06);
+  --radius:14px;
+  --radius-sm:10px;
+  --grid-gap:16px;
+  --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+html[data-theme="dark"]{
+  --bg:#0B1220;
+  --bg-grad:radial-gradient(1200px 600px at 15% -10%, #16233D 0%, transparent 60%),
+            radial-gradient(900px 500px at 100% 0%, #131E33 0%, transparent 55%);
+  --card:#121A2B;
+  --card-2:#0F1726;
+  --navy:#0A1526;
+  --navy-2:#101E38;
+  --blue:#4D9BFF;
+  --blue-deep:#2E7BE0;
+  --blue-soft:#152741;
+  --orange:#F08A4B;
+  --orange-soft:#2E2118;
+  --slate:#8FA0B8;
+  --slate-soft:#1A2436;
+  --green:#3DDC97;
+  --green-soft:#122A21;
+  --red:#FF7B7B;
+  --red-soft:#2E1717;
+  --text:#E8EEF8;
+  --muted:#94A3B8;
+  --border:#22304A;
+  --track:#1B2639;
+  --shadow:0 4px 6px -1px rgba(0,0,0,.35);
+  --shadow-lg:0 18px 40px -18px rgba(0,0,0,.65);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font);
+  background-color:var(--bg);
+  background-image:var(--bg-grad);
+  color:var(--text);
+  font-size:14px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+::selection{background:var(--blue);color:#fff}
+button{font-family:inherit}
+h1,h2,h3,h4{margin:0;font-weight:700;letter-spacing:-.01em}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+header.top{
+  position:sticky;top:0;z-index:60;
+  backdrop-filter:blur(14px);
+  background:color-mix(in srgb, var(--card) 86%, transparent);
+  border-bottom:1px solid var(--border);
+}
+.top-inner{
+  max-width:1560px;margin:0 auto;padding:14px 22px;
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand .mark{
+  width:40px;height:40px;border-radius:11px;flex:0 0 auto;
+  background:linear-gradient(145deg,var(--navy),#25406F);
+  display:grid;place-items:center;color:#fff;font-weight:800;font-size:17px;
+  box-shadow:0 6px 16px -6px rgba(15,31,61,.6);
+}
+.brand h1{font-size:15.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand .sub{font-size:11.5px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  border:1px solid var(--border);background:var(--card);color:var(--text);
+  padding:9px 13px;border-radius:10px;font-size:12.5px;font-weight:600;
+  cursor:pointer;transition:.16s;white-space:nowrap;
+}
+.btn:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn svg{width:15px;height:15px;flex:0 0 auto}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.primary:hover{background:var(--navy-2);border-color:var(--navy-2);color:#fff}
+.btn.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.blue:hover{filter:brightness(1.08);color:#fff}
+.btn.ghost{background:transparent}
+.btn.icon{padding:9px;width:38px;justify-content:center}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+main{max-width:1560px;margin:0 auto;padding:20px 22px 60px}
+.grid{display:grid;gap:var(--grid-gap)}
+.cols-kpi{grid-template-columns:repeat(6,minmax(0,1fr))}
+.cols-main{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr)}
+.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:1350px){.cols-kpi{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:1100px){.cols-main{grid-template-columns:1fr}.cols-3{grid-template-columns:1fr}}
+@media(max-width:760px){.cols-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}.cols-2{grid-template-columns:1fr}}
+@media(max-width:520px){.cols-kpi{grid-template-columns:1fr}}
+
+.card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:16px 18px;
+}
+.card-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.card-head h3{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.card-head .spacer{margin-left:auto}
+
+/* ============================================================
+   KPI
+   ============================================================ */
+.kpi{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:14px 15px;display:flex;flex-direction:column;gap:9px;
+  position:relative;overflow:hidden;transition:.18s;
+}
+.kpi:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.kpi::after{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--blue);opacity:.9}
+.kpi.t-int::after{background:var(--blue)}
+.kpi.t-ext::after{background:var(--orange)}
+.kpi.t-res::after{background:var(--slate)}
+.kpi.t-tot::after{background:linear-gradient(90deg,var(--navy),var(--blue))}
+.kpi.t-pag::after{background:var(--green)}
+.kpi.t-n::after{background:var(--slate)}
+.kpi .k-label{font-size:9.6px;font-weight:800;letter-spacing:.085em;text-transform:uppercase;color:var(--muted);line-height:1.35;min-height:26px}
+.kpi .k-value{font-size:23px;font-weight:800;letter-spacing:-.025em;font-variant-numeric:tabular-nums}
+.kpi .k-foot{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.kpi .k-note{font-size:10.5px;color:var(--muted);font-weight:600}
+.pill{
+  display:inline-flex;align-items:center;gap:4px;padding:2.5px 8px;border-radius:99px;
+  font-size:10.5px;font-weight:800;letter-spacing:.02em;font-variant-numeric:tabular-nums;
+}
+.pill.up{background:var(--red-soft);color:var(--red)}
+.pill.down{background:var(--green-soft);color:var(--green)}
+.pill.blue{background:var(--blue-soft);color:var(--blue)}
+.pill.green{background:var(--green-soft);color:var(--green)}
+.pill.gray{background:var(--slate-soft);color:var(--muted)}
+.pill.orange{background:var(--orange-soft);color:var(--orange)}
+.pill svg{width:11px;height:11px}
+
+/* ============================================================
+   FILTER BAR
+   ============================================================ */
+.filters{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:11px 14px;margin-bottom:var(--grid-gap);
+}
+.filters .fl{display:flex;flex-direction:column;gap:3px}
+.filters label{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+select,input[type="text"],input[type="search"]{
+  font-family:inherit;font-size:12.5px;font-weight:600;color:var(--text);
+  background:var(--card-2);border:1px solid var(--border);border-radius:9px;
+  padding:8px 11px;outline:none;transition:.15s;min-width:132px;
+}
+select:focus,input:focus{border-color:var(--blue);box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 16%,transparent)}
+.filters .grow{flex:1;min-width:180px}
+.filters .grow input{width:100%}
+.filters .sep{width:1px;height:34px;background:var(--border)}
+.filters .meta{margin-left:auto;font-size:11px;color:var(--muted);font-weight:700;text-align:right;line-height:1.4}
+.filters .meta b{color:var(--text)}
+
+/* ============================================================
+   BANNER SALDO
+   ============================================================ */
+.banner{
+  background:linear-gradient(135deg,var(--navy) 0%,#1E3A6B 100%);
+  border-radius:var(--radius-sm);padding:16px 18px;color:#fff;position:relative;overflow:hidden;
+}
+.banner::before{
+  content:"";position:absolute;right:-40px;top:-60px;width:190px;height:190px;border-radius:50%;
+  background:radial-gradient(circle,rgba(77,155,255,.42),transparent 70%);
+}
+.banner .bl{font-size:10px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;opacity:.82}
+.banner .bv{font-size:26px;font-weight:800;letter-spacing:-.025em;margin-top:3px;font-variant-numeric:tabular-nums}
+.banner .bs{font-size:11px;opacity:.75;margin-top:5px;font-weight:600}
+
+/* ============================================================
+   DONUT / LEGENDA
+   ============================================================ */
+.donut-wrap{display:flex;align-items:center;gap:18px;margin:16px 0 6px;flex-wrap:wrap}
+.donut-wrap svg{flex:0 0 auto}
+.donut-center{font-variant-numeric:tabular-nums}
+.legend{display:flex;flex-direction:column;gap:9px;flex:1;min-width:150px}
+.legend .li{display:flex;align-items:center;gap:8px;font-size:12px}
+.legend .dot{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+.legend .nm{color:var(--muted);font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.legend .vl{font-weight:800;font-variant-numeric:tabular-nums}
+.legend .pc{color:var(--muted);font-weight:700;font-size:11px;min-width:42px;text-align:right}
+
+/* ============================================================
+   HBARS
+   ============================================================ */
+.hbars{display:flex;flex-direction:column;gap:11px}
+.hbar{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center}
+.hbar .hl{font-size:11.8px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbar .hv{font-size:11.8px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--text)}
+.hbar .track{grid-column:1/-1;height:8px;background:var(--track);border-radius:99px;overflow:hidden}
+.hbar .fill{display:block;height:100%;border-radius:99px;background:var(--blue);transition:width .7s cubic-bezier(.2,.8,.2,1)}
+
+/* ============================================================
+   TABELA
+   ============================================================ */
+.tbl-scroll{position:relative;overflow:auto;max-height:430px;border-radius:var(--radius-sm);border:1px solid var(--border)}
+.tbl-scroll::after{content:"";position:sticky;bottom:0;left:0;display:block;height:26px;margin-top:-26px;background:linear-gradient(to bottom,transparent,var(--card));pointer-events:none}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+thead th{
+  position:sticky;top:0;z-index:2;background:var(--card-2);
+  text-align:left;font-size:9.8px;font-weight:800;letter-spacing:.075em;text-transform:uppercase;
+  color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;
+}
+thead th.sortable{cursor:pointer;user-select:none}
+thead th.sortable:hover{color:var(--blue)}
+thead th .arw{opacity:.35;font-size:9px}
+thead th.on .arw{opacity:1;color:var(--blue)}
+tbody td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr:hover{background:var(--card-2)}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.strong{font-weight:700}
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:800;letter-spacing:.02em}
+.tag.INTERNA{background:var(--blue-soft);color:var(--blue)}
+.tag.EXTERNA{background:var(--orange-soft);color:var(--orange)}
+.tag.REESTRUTURACAO,.tag.REESTRUTURAÇÃO{background:var(--slate-soft);color:var(--muted)}
+tfoot td{padding:10px 12px;font-weight:800;border-top:2px solid var(--border);background:var(--card-2);font-variant-numeric:tabular-nums}
+.pager{display:flex;align-items:center;gap:8px;justify-content:center;padding-top:12px;font-size:12px;color:var(--muted);font-weight:700}
+.pager button{border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:8px;padding:5px 10px;cursor:pointer;font-weight:700;font-size:12px}
+.pager button:disabled{opacity:.4;cursor:not-allowed}
+.pager button:not(:disabled):hover{border-color:var(--blue);color:var(--blue)}
+
+/* ============================================================
+   HIGHLIGHT BOX
+   ============================================================ */
+.note{
+  background:var(--card-2);border:1px solid var(--border);border-left:3px solid var(--orange);
+  border-radius:var(--radius-sm);padding:12px 14px;font-size:11.8px;color:var(--muted);line-height:1.55;
+}
+.note b{color:var(--text)}
+.note .nt{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--orange);margin-bottom:5px}
+.note .nt svg{width:13px;height:13px}
+
+/* ============================================================
+   DROPZONE / MODAL / TOAST
+   ============================================================ */
+.dropzone{
+  border:2px dashed var(--border);border-radius:var(--radius-sm);
+  padding:18px;text-align:center;color:var(--muted);font-size:12.5px;font-weight:600;
+  transition:.18s;cursor:pointer;background:var(--card-2);
+}
+.dropzone:hover,.dropzone.over{border-color:var(--blue);color:var(--blue);background:var(--blue-soft)}
+.dropzone svg{width:26px;height:26px;margin-bottom:6px;opacity:.8}
+.dropzone small{display:block;font-size:10.5px;font-weight:600;opacity:.85;margin-top:3px}
+
+.overlay{
+  position:fixed;inset:0;background:rgba(9,16,30,.55);backdrop-filter:blur(4px);
+  display:none;place-items:center;z-index:200;padding:20px;
+}
+.overlay.show{display:grid}
+.modal{
+  background:var(--card);border:1px solid var(--border);border-radius:18px;
+  box-shadow:var(--shadow-lg);width:min(520px,100%);padding:24px;max-height:88vh;overflow:auto;
+}
+.modal h3{font-size:16px;margin-bottom:6px}
+.modal p{color:var(--muted);font-size:12.5px;margin:0 0 16px}
+.modal .row{display:flex;gap:10px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap}
+.log{background:var(--card-2);border:1px solid var(--border);border-radius:10px;padding:12px;font-family:var(--mono);font-size:11.5px;max-height:210px;overflow:auto;white-space:pre-wrap;line-height:1.6}
+.log .ok{color:var(--green);font-weight:700}
+.log .err{color:var(--red);font-weight:700}
+
+.toast-wrap{position:fixed;right:20px;bottom:20px;z-index:300;display:flex;flex-direction:column;gap:9px;align-items:flex-end}
+.toast{
+  background:var(--navy);color:#fff;padding:12px 16px;border-radius:12px;font-size:12.5px;font-weight:600;
+  box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:9px;max-width:360px;
+  animation:tin .3s cubic-bezier(.2,.8,.2,1);
+}
+.toast.ok{background:linear-gradient(135deg,#0F5132,#1E8E5A)}
+.toast.err{background:linear-gradient(135deg,#7A1E1E,#C53030)}
+.toast svg{width:16px;height:16px;flex:0 0 auto}
+@keyframes tin{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+
+/* ============================================================
+   PRAZO / LINHA / GRUPO
+   ============================================================ */
+.spark{display:block;width:100%;height:auto;overflow:visible}
+.axis{font-size:9.5px;fill:var(--muted);font-weight:700}
+.gline{stroke:var(--border);stroke-width:1}
+.legend-inline{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;font-weight:700;color:var(--muted);margin-top:10px}
+.legend-inline i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px}
+
+footer.foot{
+  max-width:1560px;margin:0 auto;padding:26px 22px 44px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  border-top:1px solid var(--border);margin-top:34px;
+}
+.plate{
+  background:linear-gradient(145deg,#1B2C4B,#0C1830 55%,#1F3358);
+  border:1px solid #2C4268;border-radius:12px;padding:12px 20px;color:#fff;
+  box-shadow:0 14px 30px -14px rgba(11,24,48,.75), inset 0 1px 0 rgba(255,255,255,.13);
+  position:relative;overflow:hidden;
+}
+.plate::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.14) 46%,transparent 60%)}
+.plate .pn{font-size:16px;font-weight:800;letter-spacing:.055em;background:linear-gradient(180deg,#F2F7FF,#9DB8DE);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.plate .pr{font-size:9.5px;font-weight:800;letter-spacing:.11em;color:#8FAEDC;text-transform:uppercase;margin-top:3px}
+.foot .src{font-size:11px;color:var(--muted);font-weight:600;line-height:1.6}
+.foot .src b{color:var(--text)}
+
+.hidden{display:none!important}
+.badge-live{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;letter-spacing:.05em;color:var(--green);text-transform:uppercase}
+.badge-live i{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 22%,transparent);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.45}}
+.skeleton{color:var(--muted);font-size:12px;padding:20px;text-align:center}
+@media print{
+  header.top,.filters,.top-actions,.pager,.foot{display:none!important}
+  body{background:#fff}
+  .card,.kpi{box-shadow:none;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <div class="mark">S</div>
+      <div>
+        <h1>Painel de Estoque &amp; Pagamento da Dívida Pública</h1>
+        <div class="sub">SEPLAN&nbsp;MA &middot; Gestão da Dívida Pública</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <span class="badge-live" title="Dados carregados"><i></i><span id="srcBadge">Base 2026</span></span>
+      <button class="btn primary" id="btnUpload">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Atualizar planilha
+      </button>
+      <button class="btn ghost" id="btnExport" title="Exportar dados filtrados em CSV">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        CSV
+      </button>
+      <button class="btn ghost icon" id="btnPrint" title="Imprimir / salvar em PDF">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      </button>
+      <button class="btn ghost icon" id="btnTheme" title="Alternar tema claro/escuro">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="filters">
+    <div class="fl"><label for="fAno">Ano de referência</label><select id="fAno"></select></div>
+    <div class="fl"><label for="fMes">Mês de referência</label><select id="fMes"></select></div>
+    <div class="fl"><label for="fTipo">Tipo de dívida</label><select id="fTipo"><option value="">Todos</option><option value="INTERNA">Interna</option><option value="EXTERNA">Externa</option><option value="REESTRUTURACAO">Reestruturação</option></select></div>
+    <div class="fl"><label for="fCredor">Credor</label><select id="fCredor"><option value="">Todos</option></select></div>
+    <div class="sep"></div>
+    <div class="fl grow"><label for="fBusca">Busca livre</label><input type="search" id="fBusca" placeholder="Filtrar contrato, credor, tipo…"></div>
+    <div class="meta" id="fMeta"></div>
+  </div>
+
+  <section class="grid cols-kpi" id="kpis" style="margin-bottom:var(--grid-gap)"></section>
+
+  <section class="grid cols-main" style="margin-bottom:var(--grid-gap)">
+    <div class="card">
+      <div class="card-head">
+        <h3>Contratos / Operações</h3>
+        <span class="spacer"></span>
+        <span class="pill gray" id="tblCount">—</span>
+      </div>
+      <div class="tbl-scroll">
+        <table id="tblEstoque">
+          <thead><tr>
+            <th class="sortable" data-k="0">Contrato / Operação <span class="arw">▲▼</span></th>
+            <th class="sortable" data-k="1">Tipo <span class="arw">▲▼</span></th>
+            <th class="sortable" data-k="2">Credor <span class="arw">▲▼</span></th>
+            <th class="num sortable" data-k="3">Saldo atual (R$) <span class="arw">▲▼</span></th>
+            <th class="num sortable" data-k="4">% total <span class="arw">▲▼</span></th>
+          </tr></thead>
+          <tbody id="tbodyEstoque"></tbody>
+          <tfoot><tr><td colspan="3">TOTAL FILTRADO</td><td class="num" id="footTotal">—</td><td class="num">100%</td></tr></tfoot>
+        </table>
+      </div>
+      <div class="pager">
+        <button id="pgPrev">‹ Anterior</button>
+        <span id="pgInfo">—</span>
+        <button id="pgNext">Próxima ›</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="banner">
+        <div class="bl">Saldo total devedor</div>
+        <div class="bv" id="bnTotal">—</div>
+        <div class="bs" id="bnSub">—</div>
+      </div>
+      <div class="card-head" style="margin-top:16px"><h3>Composição da dívida (por tipo)</h3></div>
+      <div class="donut-wrap">
+        <svg id="donut" width="168" height="168" viewBox="0 0 168 168" role="img" aria-label="Composição da dívida por tipo"></svg>
+        <div class="legend" id="donutLegend"></div>
+      </div>
+      <div class="note" id="noteBox">
+        <div class="nt">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 15 9l7 .5-5.5 4.5 2 7-6.5-4-6.5 4 2-7L2 9.5 9 9z"/></svg>
+          Destaques e análise
+        </div>
+        <span id="noteText">—</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid cols-3" style="margin-bottom:var(--grid-gap)">
+    <div class="card"><div class="card-head"><h3>Composição por credor</h3></div><div class="hbars" id="chCredor"></div></div>
+    <div class="card"><div class="card-head"><h3>Pagamentos por componente</h3></div><div class="hbars" id="chComponente"></div></div>
+    <div class="card"><div class="card-head"><h3>Concentração por tipo</h3></div><div class="hbars" id="chTipo"></div></div>
+  </section>
+
+  <section class="grid cols-2" style="margin-bottom:var(--grid-gap)">
+    <div class="card">
+      <div class="card-head"><h3>Evolução do saldo devedor</h3><span class="spacer"></span><span class="pill blue" id="evoPill">—</span></div>
+      <svg id="lineEvo" class="spark" viewBox="0 0 760 240" role="img" aria-label="Evolução mensal do saldo devedor"></svg>
+      <div class="legend-inline"><span><i style="background:var(--blue)"></i>Saldo total devedor</span><span><i style="background:var(--slate)"></i>Projeção</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Pagamentos por ano (R$)</h3></div>
+      <svg id="barAno" class="spark" viewBox="0 0 760 240" role="img" aria-label="Pagamentos por ano"></svg>
+      <div class="legend-inline"><span><i style="background:var(--blue)"></i>Principal</span><span><i style="background:var(--orange)"></i>Juros</span><span><i style="background:var(--slate)"></i>Encargos</span></div>
+    </div>
+  </section>
+
+  <section class="grid cols-3">
+    <div class="card" style="grid-column:span 2">
+      <div class="card-head"><h3>Projeção de pagamentos por contrato</h3><span class="spacer"></span><span class="pill gray" id="projCount">—</span></div>
+      <div class="tbl-scroll" style="max-height:330px">
+        <table id="tblProj">
+          <thead><tr>
+            <th>Contrato</th>
+            <th class="num">Principal acum.</th>
+            <th class="num">Principal méd./mês</th>
+            <th class="num">Juros acum.</th>
+            <th class="num">Juros méd./mês</th>
+            <th class="num">Total acum.</th>
+          </tr></thead>
+          <tbody id="tbodyProj"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Atualizar base de dados</h3></div>
+      <div class="dropzone" id="dropzone">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Arraste a planilha <b>.xlsx</b> aqui ou clique para selecionar
+        <small>Lê as abas BASE ESTQ, BASE PGTO, SALDO DEVEDOR 2025 e PROJ DIVIDA</small>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn ghost" id="btnRestore" style="flex:1;justify-content:center">Restaurar base original</button>
+      </div>
+      <div class="note" style="margin-top:14px;border-left-color:var(--blue)">
+        <div class="nt" style="color:var(--blue)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          Como funciona
+        </div>
+        A planilha é processada <b>100% no seu navegador</b> — nenhum dado sai do seu computador. O painel recalcula KPIs, gráficos e tabelas na hora, e a base fica salva localmente para a próxima visita.
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="plate">
+    <div class="pn">JOKSON MUNIZ</div>
+    <div class="pr">Analista &amp; Gestor de Dívida Pública | SEPLAN MA</div>
+  </div>
+  <div class="src">
+    Fonte: <b>RELATÓRIO ESTOQUE / PAGAMENTO DE DÍVIDA</b> — abas BASE ESTQ, BASE PGTO, PROJ DIVIDA e SALDO DEVEDOR 2025.<br>
+    Valores em Reais (R$). Processamento local no navegador · <span id="footStamp">—</span>
+  </div>
+</footer>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h3 id="mTitle">Atualizar base de dados</h3>
+    <p id="mDesc">Selecione a planilha Excel (.xlsx) do relatório de estoque e pagamento da dívida.</p>
+    <div class="dropzone" id="dropzone2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Arraste o arquivo aqui ou clique para selecionar
+      <small>.xlsx · até ~20 MB</small>
+    </div>
+    <div class="log hidden" id="mLog"></div>
+    <div class="row">
+      <button class="btn ghost" id="mClose">Fechar</button>
+      <button class="btn blue" id="mPick">Escolher arquivo</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept=".xlsx,.xls,.xlsm" class="hidden">
+<input type="file" id="fileInput2" accept=".xlsx,.xls,.xlsm" class="hidden">
+<div class="toast-wrap" id="toasts"></div>
+<script type="application/json" id="seed">
+{"estoque":{"2026-01":[["BNDES A - 12214421 019","INTERNA",314231663.8],["BNDES B  - 12214421 027","INTERNA",437545716.87],["BNDES C  - 12214421 035","INTERNA",528972624.62],["BNDES PEF II  -  10204281 013","INTERNA",91322666.93],["BNDES PROINVESTE - 12210761 010","INTERNA",791065784.94],["BNDES FINEM A - 23.203.181 017","INTERNA",88600787.62],["BNDES FINEM B - 23.203.181 025","INTERNA",37710110.54],["LEI 9496","REESTRUTURACAO",419587604.75],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",1513448535.91],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",92311657.71],["CEF/MOB","INTERNA",30174251.3],["BB/Prog.Mais Justo e Comp. I","INTERNA",0.0],["BB/CONTRATO Nº 40/00058-3","INTERNA",658909889.19],["BID / PROFISCO I","EXTERNA",23409000.08],["BID / PROFISCO II","EXTERNA",173325600.0]],"2026-02":[["BNDES A - 12214421 019","INTERNA",307606254.0],["BNDES B  - 12214421 027","INTERNA",430369674.36],["BNDES C  - 12214421 035","INTERNA",521912949.21],["BNDES PEF II  -  10204281 013","INTERNA",90043643.59],["BNDES PROINVESTE - 12210761 010","INTERNA",788319669.7],["BNDES FINEM A - 23.203.181 017","INTERNA",89435399.07],["BNDES FINEM B - 23.203.181 025","INTERNA",38065336.39],["LEI 9496","REESTRUTURACAO",406324508.49],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",1524116089.8],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",87696074.87],["CEF/MOB","INTERNA",30104542.16],["BB/Prog.Mais Justo e Comp. I","INTERNA",0.0],["BB/CONTRATO Nº 40/00058-3","INTERNA",652751852.85],["BID / PROFISCO I","EXTERNA",21907648.65],["BID / PROFISCO II","EXTERNA",162209250.0]],"2026-03":[["BNDES A - 12214421 019","INTERNA",301670980.97],["BNDES B  - 12214421 027","INTERNA",424168994.33],["BNDES C  - 12214421 035","INTERNA",516043791.93],["BNDES PEF II  -  10204281 013","INTERNA",88969730.11],["BNDES PROINVESTE - 12210761 010","INTERNA",787408814.09],["BNDES FINEM A - 23.203.181 017","INTERNA",90655250.69],["BNDES FINEM B - 23.203.181 025","INTERNA",38584527.47],["LEI 9496","REESTRUTURACAO",392520749.78],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",1533999001.69],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",83080492.03],["CEF/MOB","INTERNA",30018574.65],["BB/Prog.Mais Justo e Comp. I","INTERNA",0.0],["BB/CONTRATO Nº 40/00058-3","INTERNA",646593816.51],["BID / PROFISCO I","EXTERNA",19362328.3],["BID / PROFISCO II","EXTERNA",159838440.16]],"2026-04":[["BNDES A - 12214421 019","INTERNA",295371252.27],["BNDES B  - 12214421 027","INTERNA",417468627.19],["BNDES C  - 12214421 035","INTERNA",509576679.53],["BNDES PEF II  -  10204281 013","INTERNA",87792355.72],["BNDES PROINVESTE - 12210761 010","INTERNA",785633431.39],["BNDES FINEM A - 23.203.181 017","INTERNA",88811489.89],["BNDES FINEM B - 23.203.181 025","INTERNA",82813877.56],["LEI 9496","REESTRUTURACAO",377777600.81],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",1541380817.87],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",78464909.19],["CEF/MOB","INTERNA",29947528.4],["BB/Prog.Mais Justo e Comp. I","INTERNA",0.0],["BB/CONTRATO Nº 40/00058-3","INTERNA",646593816.51],["BID / PROFISCO I","EXTERNA",19100814.92],["BID / PROFISCO II","EXTERNA",157679614.52]],"2026-05":[["BNDES A - 12214421 019","INTERNA",289117138.12],["BNDES B  - 12214421 027","INTERNA",410844047.67],["BNDES C  - 12214421 035","INTERNA",503210867.13],["BNDES PEF II  -  10204281 013","INTERNA",86632109.23],["BNDES PROINVESTE - 12210761 010","INTERNA",784056318.63],["BNDES FINEM A - 23.203.181 017","INTERNA",90143180.11],["BNDES FINEM B - 23.203.181 025","INTERNA",84055636.15],["LEI 9496","REESTRUTURACAO",363536734.62],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",1552082676.07],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",73849326.35],["CEF/MOB","INTERNA",29873858.42],["BB/Prog.Mais Justo e Comp. I","INTERNA",0.0],["BB/CONTRATO Nº 40/00058-3","INTERNA",640435780.17],["BID / PROFISCO I","EXTERNA",19362328.3],["BID / PROFISCO II","EXTERNA",154867562.5]],"2026-06":[["BNDES A - 12214421 019","INTERNA",282696488.01],["BNDES B  - 12214421 027","INTERNA",403994000.42],["BNDES C  - 12214421 035","INTERNA",496577538.11],["BNDES PEF II  -  10204281 013","INTERNA",85425489.5],["BNDES PROINVESTE - 12210761 010","INTERNA",782103619.5],["BNDES FINEM A - 23.203.181 017","INTERNA",137669667.48],["BNDES FINEM B - 23.203.181 025","INTERNA",90250730.68],["LEI 9496","REESTRUTURACAO",370566772.6],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",1560960433.94],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",69233743.51],["CEF/MOB","INTERNA",29799473.83],["BB/Prog.Mais Justo e Comp. I","INTERNA",0.0],["BB/CONTRATO Nº 40/00058-3","INTERNA",628119707.49],["BID / PROFISCO I","EXTERNA",19820646.78],["BID / PROFISCO II","EXTERNA",158533375.0]],"2026-07":[["BNDES A - 12214421 019","INTERNA",276375404.24],["BNDES B  - 12214421 027","INTERNA",397297754.05],["BNDES C  - 12214421 035","INTERNA",490142101.39],["BNDES PEF II  -  10204281 013","INTERNA",84252588.64],["BNDES PROINVESTE - 12210761 010","INTERNA",780504654.15],["BNDES FINEM A - 23.203.181 017","INTERNA",134788857.88],["BNDES FINEM B - 23.203.181 025","INTERNA",87677091.11],["LEI 9496","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",64618160.67],["CEF/MOB","INTERNA",29724781.13],["BB/Prog.Mais Justo e Comp. I","INTERNA",0.0],["BB/CONTRATO Nº 40/00058-3","INTERNA",621961671.15],["PROPAG (LEI 9496 + 281/2022/CAF) - inicio","INTERNA",1941772646.78],["BID / PROFISCO I","EXTERNA",19440437.72],["BID / PROFISCO II","EXTERNA",160483243.14]],"2026-08":[["BNDES A - 12214421 019","INTERNA",269863784.97],["BNDES B  - 12214421 027","INTERNA",390339197.63],["BNDES C  - 12214421 035","INTERNA",483391907.22],["BNDES PEF II  -  10204281 013","INTERNA",83025259.46],["BNDES PROINVESTE - 12210761 010","INTERNA",778446401.42],["BNDES FINEM A - 23.203.181 017","INTERNA",135957983.05],["BNDES FINEM B - 23.203.181 025","INTERNA",88437580.48],["LEI 9496","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",60002577.83],["CEF/MOB","INTERNA",29649708.88],["BB/Prog.Mais Justo e Comp. I","INTERNA",0.0],["BB/CONTRATO Nº 40/00058-3","INTERNA",615803634.81],["PROPAG (LEI 9496 + 281/2022/CAF)","INTERNA",1939461991.41],["BID / PROFISCO I","EXTERNA",19839791.24],["BID / PROFISCO II","EXTERNA",163779955.8]],"2026-09":[["BNDES A - 12214421 019","INTERNA",0.0],["BNDES B  - 12214421 027","INTERNA",0.0],["BNDES C  - 12214421 035","INTERNA",0.0],["BNDES PEF II  -  10204281 013","INTERNA",0.0],["BNDES PROINVESTE - 12210761 010","INTERNA",0.0],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",55386994.19],["CEF/MOB","INTERNA",29615424.78],["BB/Prog.Mais Justo e Comp. I","INTERNA",0.0],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["PROPAG (LEI 9496 + 281/2022/CAF)","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",17632987.57],["BID / PROFISCO II","EXTERNA",158737357.35]],"2025-01":[["BNDES A - 12214421 019","INTERNA",387766306.05],["BNDES B  - 12214421 027","INTERNA",516006835.4],["BNDES C  - 12214421 035","INTERNA",594224512.05],["BNDES PEF II  -  10204281 013","INTERNA",105144615.13],["BNDES PROINVESTE - 12210761 010","INTERNA",813488615.29],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",653535689.65],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",353647347.18],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",147698651.79],["CEF/MOB","INTERNA",30972749.49],["BB/Prog.Mais Justo e Comp. I","INTERNA",9343947.56],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",29763771.02],["BID / PROFISCO II","EXTERNA",204053499.99]],"2025-02":[["BNDES A - 12214421 019","INTERNA",381146122.05],["BNDES B  - 12214421 027","INTERNA",508772397.23],["BNDES C  - 12214421 035","INTERNA",587169915.02],["BNDES PEF II  -  10204281 013","INTERNA",103846394.53],["BNDES PROINVESTE - 12210761 010","INTERNA",810309170.91],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",642889249.71],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",355162120.39],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",143083068.95],["CEF/MOB","INTERNA",30912825.41],["BB/Prog.Mais Justo e Comp. I","INTERNA",9456544.64],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",29859238.08],["BID / PROFISCO II","EXTERNA",204707999.99]],"2025-03":[["BNDES A - 12214421 019","INTERNA",375148370.51],["BNDES B  - 12214421 027","INTERNA",502373043.32],["BNDES C  - 12214421 035","INTERNA",581082499.81],["BNDES PEF II  -  10204281 013","INTERNA",102719095.46],["BNDES PROINVESTE - 12210761 010","INTERNA",808481771.73],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",632555961.01],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",356969368.84],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",138467486.11],["CEF/MOB","INTERNA",30840775.24],["BB/Prog.Mais Justo e Comp. I","INTERNA",9555524.83],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",29315024.77],["BID / PROFISCO II","EXTERNA",200976999.99]],"2025-04":[["BNDES A - 12214421 019","INTERNA",369150078.18],["BNDES B  - 12214421 027","INTERNA",495980144.2],["BNDES C  - 12214421 035","INTERNA",575008331.79],["BNDES PEF II  -  10204281 013","INTERNA",101593912.89],["BNDES PROINVESTE - 12210761 010","INTERNA",806702014.73],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",621832067.79],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",358683720.52],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",133851903.27],["CEF/MOB","INTERNA",30760785.72],["BB/Prog.Mais Justo e Comp. I","INTERNA",9688297.86],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",26491173.75],["BID / PROFISCO II","EXTERNA",183268400.0]],"2025-05":[["BNDES A - 12214421 019","INTERNA",363154363.66],["BNDES B  - 12214421 027","INTERNA",489598303.33],["BNDES C  - 12214421 035","INTERNA",568953079.7],["BNDES PEF II  -  10204281 013","INTERNA",100471835.49],["BNDES PROINVESTE - 12210761 010","INTERNA",804979525.5],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",610763655.96],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",360327336.47],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",129236320.43],["CEF/MOB","INTERNA",30698311.77],["BB/Prog.Mais Justo e Comp. I","INTERNA",9790898.26],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",26715334.15],["BID / PROFISCO II","EXTERNA",184819162.5]],"2025-06":[["BNDES A - 12214421 019","INTERNA",356900288.84],["BNDES B  - 12214421 027","INTERNA",482874954.08],["BNDES C  - 12214421 035","INTERNA",572112548.42],["BNDES PEF II  -  10204281 013","INTERNA",99280426.71],["BNDES PROINVESTE - 12210761 010","INTERNA",802730634.86],["BNDES FINEM A - 23.203.181 017","INTERNA",10004881.35],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",600026382.03],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",362304531.82],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",124620737.59],["CEF/MOB","INTERNA",30635669.34],["BB/Prog.Mais Justo e Comp. I","INTERNA",4623043.0],["BB/CONTRATO Nº 40/00058-3","INTERNA",665067925.53],["BID / PROFISCO I","EXTERNA",25537907.05],["BID / PROFISCO II","EXTERNA",176673612.5]],"2025-07":[["BNDES A - 12214421 019","INTERNA",350998925.17],["BNDES B  - 12214421 027","INTERNA",476636514.48],["BNDES C  - 12214421 035","INTERNA",566118462.14],["BNDES PEF II  -  10204281 013","INTERNA",98189562.76],["BNDES PROINVESTE - 12210761 010","INTERNA",801327419.48],["BNDES FINEM A - 23.203.181 017","INTERNA",10055643.08],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",589535062.79],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",364588196.72],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",120005154.75],["CEF/MOB","INTERNA",30571748.7],["BB/Prog.Mais Justo e Comp. I","INTERNA",4686135.06],["BB/CONTRATO Nº 40/00058-3","INTERNA",665067925.53],["BID / PROFISCO I","EXTERNA",26216471.96],["BID / PROFISCO II","EXTERNA",181367987.5]],"2025-08":[["BNDES A - 12214421 019","INTERNA",344933686.17],["BNDES B  - 12214421 027","INTERNA",470184647.91],["BNDES C  - 12214421 035","INTERNA",559896521.52],["BNDES PEF II  -  10204281 013","INTERNA",97055728.36],["BNDES PROINVESTE - 12210761 010","INTERNA",799611989.7],["BNDES FINEM A - 23.203.181 017","INTERNA",50386123.88],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",481754311.93],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",1481295393.82],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",115389571.91],["CEF/MOB","INTERNA",30508738.46],["BB/Prog.Mais Justo e Comp. I","INTERNA",4750572.71],["BB/CONTRATO Nº 40/00058-3","INTERNA",665067925.53],["BID / PROFISCO I","EXTERNA",25394238.49],["BID / PROFISCO II","EXTERNA",175679700.0]],"2025-09":[["BNDES A - 12214421 019","INTERNA",338747193.54],["BNDES B  - 12214421 027","INTERNA",463575644.61],["BNDES C  - 12214421 035","INTERNA",553494016.47],["BNDES PEF II  -  10204281 013","INTERNA",95890345.85],["BNDES PROINVESTE - 12210761 010","INTERNA",797670856.73],["BNDES FINEM A - 23.203.181 017","INTERNA",50825881.55],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",470280208.43],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",1473823788.99],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",110773989.07],["CEF/MOB","INTERNA",30443733.28],["BB/Prog.Mais Justo e Comp. I","INTERNA",4822164.38],["BB/CONTRATO Nº 40/00058-3","INTERNA",665067925.53],["BID / PROFISCO I","EXTERNA",24889760.58],["BID / PROFISCO II","EXTERNA",172189675.0]],"2025-10":[["BNDES A - 12214421 019","INTERNA",332713271.51],["BNDES B  - 12214421 027","INTERNA",457184278.65],["BNDES C  - 12214421 035","INTERNA",547358451.37],["BNDES PEF II  -  10204281 013","INTERNA",94770941.96],["BNDES PROINVESTE - 12210761 010","INTERNA",796149122.38],["BNDES FINEM A - 23.203.181 017","INTERNA",50340985.8],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",457989148.29],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",1483447003.75],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",110773989.07],["CEF/MOB","INTERNA",30443733.28],["BB/Prog.Mais Justo e Comp. I","INTERNA",4888472.53],["BB/CONTRATO Nº 40/00058-3","INTERNA",665067925.53],["BID / PROFISCO I","EXTERNA",25197220.68],["BID / PROFISCO II","EXTERNA",174316712.5]],"2025-11":[["BNDES A - 12214421 019","INTERNA",326371168.95],["BNDES B  - 12214421 027","INTERNA",450377919.87],["BNDES C  - 12214421 035","INTERNA",540732810.15],["BNDES PEF II  -  10204281 013","INTERNA",93566430.32],["BNDES PROINVESTE - 12210761 010","INTERNA",793947601.77],["BNDES FINEM A - 23.203.181 017","INTERNA",50820204.86],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",445653523.01],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",1493943221.83],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",106158406.23],["CEF/MOB","INTERNA",30312701.39],["BB/Prog.Mais Justo e Comp. I","INTERNA",5027104.96],["BB/CONTRATO Nº 40/00058-3","INTERNA",665067925.53],["BID / PROFISCO I","EXTERNA",24960892.9],["BID / PROFISCO II","EXTERNA",172681775.0]],"2025-12":[["BNDES A - 12214421 019","INTERNA",320396480.32],["BNDES B  - 12214421 027","INTERNA",444088010.75],["BNDES C  - 12214421 035","INTERNA",535272627.93],["BNDES PEF II  -  10204281 013","INTERNA",92470227.63],["BNDES PROINVESTE - 12210761 010","INTERNA",792704013.89],["BNDES FINEM A - 23.203.181 017","INTERNA",89573868.36],["BNDES FINEM B - 23.203.181 025","INTERNA",37666802.91],["LEI 9496","REESTRUTURACAO",433247698.91],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",1505329502.7],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",96927240.55],["CEF/MOB","INTERNA",30242305.57],["BB/Prog.Mais Justo e Comp. I","INTERNA",0.0],["BB/CONTRATO Nº 40/00058-3","INTERNA",665067925.53],["BID / PROFISCO I","EXTERNA",23409000.08],["BID / PROFISCO II","EXTERNA",173325600.0]],"2024-01":[["BNDES A - 12214421 019","INTERNA",464925248.86],["BNDES B  - 12214421 027","INTERNA",599970932.94],["BNDES C  - 12214421 035","INTERNA",674459105.17],["BNDES PEF II  -  10204281 013","INTERNA",120163832.2],["BNDES PROINVESTE - 12210761 010","INTERNA",848138351.47],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",773087322.71],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",338579953.59],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",203085645.87],["CEF/MOB","INTERNA",32014329.6],["BB/Prog.Mais Justo e Comp. I","INTERNA",18696375.61],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",29503321.22],["BID / PROFISCO II","EXTERNA",131898986.49]],"2024-02":[["BNDES A - 12214421 019","INTERNA",458196687.77],["BNDES B  - 12214421 027","INTERNA",592576152.43],["BNDES C  - 12214421 035","INTERNA",667220670.17],["BNDES PEF II  -  10204281 013","INTERNA",118831138.65],["BNDES PROINVESTE - 12210761 010","INTERNA",844621927.8],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",764295419.06],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",339938508.98],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",198470063.03],["CEF/MOB","INTERNA",31937535.64],["BB/Prog.Mais Justo e Comp. I","INTERNA",18899271.6],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",29680811.67],["BID / PROFISCO II","EXTERNA",132692483.97]],"2024-03":[["BNDES A - 12214421 019","INTERNA",451824580.94],["BNDES B  - 12214421 027","INTERNA",585643453.73],["BNDES C  - 12214421 035","INTERNA",660503428.25],["BNDES PEF II  -  10204281 013","INTERNA",117591232.72],["BNDES PROINVESTE - 12210761 010","INTERNA",841769968.25],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",755877088.64],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",341543905.88],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",193854479.67],["CEF/MOB","INTERNA",31843676.32],["BB/Prog.Mais Justo e Comp. I","INTERNA",19077846.89],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",27632098.73],["BID / PROFISCO II","EXTERNA",133035977.85]],"2024-04":[["BNDES A - 12214421 019","INTERNA",445228226.88],["BNDES B  - 12214421 027","INTERNA",578421606.69],["BNDES C  - 12214421 035","INTERNA",653461335.7],["BNDES PEF II  -  10204281 013","INTERNA",116293442.48],["BNDES PROINVESTE - 12210761 010","INTERNA",838510527.01],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",746045656.71],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",342588491.34],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",189238897.35],["CEF/MOB","INTERNA",31739356.55],["BB/Prog.Mais Justo e Comp. I","INTERNA",19282658.24],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",28603276.13],["BID / PROFISCO II","EXTERNA",137711754.99]],"2024-05":[["BNDES A - 12214421 019","INTERNA",438803918.23],["BNDES B  - 12214421 027","INTERNA",571424708.61],["BNDES C  - 12214421 035","INTERNA",647912044.28],["BNDES PEF II  -  10204281 013","INTERNA",115041043.05],["BNDES PROINVESTE - 12210761 010","INTERNA",835584858.88],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",736290986.6],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",343740638.48],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",184623314.51],["CEF/MOB","INTERNA",31665286.93],["BB/Prog.Mais Justo e Comp. I","INTERNA",19466276.48],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",28989313.62],["BID / PROFISCO II","EXTERNA",139570349.77]],"2024-06":[["BNDES A - 12214421 019","INTERNA",432032983.72],["BNDES B  - 12214421 027","INTERNA",563977363.36],["BNDES C  - 12214421 035","INTERNA",640604422.65],["BNDES PEF II  -  10204281 013","INTERNA",113698065.47],["BNDES PROINVESTE - 12210761 010","INTERNA",832005527.02],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",726777816.77],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",345084753.99],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",180007731.67],["CEF/MOB","INTERNA",31585670.92],["BB/Prog.Mais Justo e Comp. I","INTERNA",13869128.96],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",30744180.31],["BID / PROFISCO II","EXTERNA",148019234.07]],"2024-07":[["BNDES A - 12214421 019","INTERNA",425836318.67],["BNDES B  - 12214421 027","INTERNA",557281418.74],["BNDES C  - 12214421 035","INTERNA",634149613.26],["BNDES PEF II  -  10204281 013","INTERNA",112506769.49],["BNDES PROINVESTE - 12210761 010","INTERNA",829543997.72],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",716700809.59],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",346242573.64],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",175392148.83],["CEF/MOB","INTERNA",31489459.72],["BB/Prog.Mais Justo e Comp. I","INTERNA",14011207.75],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",31314940.6],["BID / PROFISCO II","EXTERNA",150767185.1]],"2024-08":[["BNDES A - 12214421 019","INTERNA",419385608.43],["BNDES B  - 12214421 027","INTERNA",550255894.48],["BNDES C  - 12214421 035","INTERNA",627322139.49],["BNDES PEF II  -  10204281 013","INTERNA",111249263.7],["BNDES PROINVESTE - 12210761 010","INTERNA",826607180.04],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",706150405.17],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",347249402.16],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",170776565.99],["CEF/MOB","INTERNA",31404371.76],["BB/Prog.Mais Justo e Comp. I","INTERNA",14148185.96],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",31282309.93],["BID / PROFISCO II","EXTERNA",150610083.25]],"2024-09":[["BNDES A - 12214421 019","INTERNA",412758042.05],["BNDES B  - 12214421 027","INTERNA",542999861.57],["BNDES C  - 12214421 035","INTERNA",620233135.54],["BNDES PEF II  -  10204281 013","INTERNA",109945328.25],["BNDES PROINVESTE - 12210761 010","INTERNA",823332221.64],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",696263076.56],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",348666831.98],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",166160983.15],["CEF/MOB","INTERNA",31317597.19],["BB/Prog.Mais Justo e Comp. I","INTERNA",14299746.71],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",30131387.28],["BID / PROFISCO II","EXTERNA",190683500.0]],"2024-10":[["BNDES A - 12214421 019","INTERNA",406609708.9],["BNDES B  - 12214421 027","INTERNA",536376992.11],["BNDES C  - 12214421 035","INTERNA",613869576.32],["BNDES PEF II  -  10204281 013","INTERNA",108769900.71],["BNDES PROINVESTE - 12210761 010","INTERNA",821031637.5],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",685924083.2],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",349950063.25],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",161545400.31],["CEF/MOB","INTERNA",31229140.29],["BB/Prog.Mais Justo e Comp. I","INTERNA",14448073.05],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",29497280.07],["BID / PROFISCO II","EXTERNA",202226499.99]],"2024-11":[["BNDES A - 12214421 019","INTERNA",399974668.75],["BNDES B  - 12214421 027","INTERNA",529114879.32],["BNDES C  - 12214421 035","INTERNA",606776703.4],["BNDES PEF II  -  10204281 013","INTERNA",107465158.1],["BNDES PROINVESTE - 12210761 010","INTERNA",817767280.95],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",675191194.25],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",351122306.87],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",156929817.47],["CEF/MOB","INTERNA",31149399.29],["BB/Prog.Mais Justo e Comp. I","INTERNA",9246085.98],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",30904270.57],["BID / PROFISCO II","EXTERNA",211872499.99]],"2024-12":[["BNDES A - 12214421 019","INTERNA",383874492.54],["BNDES B  - 12214421 027","INTERNA",512563477.53],["BNDES C  - 12214421 035","INTERNA",590501429.31],["BNDES PEF II  -  10204281 013","INTERNA",96305117.92],["BNDES PROINVESTE - 12210761 010","INTERNA",800617929.15],["BNDES FINEM A - 23.203.181 017","INTERNA",0.0],["BNDES FINEM B - 23.203.181 025","INTERNA",0.0],["LEI 9496","REESTRUTURACAO",664897760.46],["BB STN/UNIÃO (GARANTIDOR) 281/CAF","REESTRUTURACAO",352619839.03],["BB STN/UNIÃO (GARANTIDOR) 281/CAF2)","REESTRUTURACAO",0.0],["BB STN/UNIÃO (GARANTIDOR) 281/CAF3)","REESTRUTURACAO",0.0],["CEF/FINISA","INTERNA",137314234.63],["CEF/MOB","INTERNA",22852008.93],["BB/Prog.Mais Justo e Comp. I","INTERNA",9246085.98],["BB/CONTRATO Nº 40/00058-3","INTERNA",0.0],["BID / PROFISCO I","EXTERNA",31612871.01],["BID / PROFISCO II","EXTERNA",216730499.99]]},"pagamentos":[["REFINANCIAMENTO 281/CAF","JAN",2025,"INTERNA",587843.33,1180783.97,17964.62,1786591.92],["CEF / FINISA","JAN",2025,"INTERNA",4615582.84,1666698.02,0.0,6282280.86],["CEF / MOB","JAN",2025,"INTERNA",111521.01,155421.35,77710.68,344653.04],["BNDES / PEF I I","JAN",2025,"INTERNA",1342805.23,608105.83,0.0,1950911.06],["BNDES/ ESTADOS A","JAN",2025,"INTERNA",6776661.68,2253112.36,0.0,9029774.04],["BNDES/ ESTADOS B","JAN",2025,"INTERNA",7449497.09,2989262.44,0.0,10438759.53],["BNDES/ ESTADOS C","JAN",2025,"INTERNA",7307791.25,3435097.26,0.0,10742888.51],["BNDES / PROINVESTE","JAN",2025,"INTERNA",3554162.03,4665645.69,0.0,8219807.72],["LEI 9496 REGOV","JAN",2025,"INTERNA",14770368.67,1987440.76,54141.59,16811951.02],["REFINANCIAMENTO 281/CAF","FEV",2025,"INTERNA",593318.63,1185851.46,18056.88,1797226.97],["CEF / FINISA","FEV",2025,"INTERNA",4615582.84,1745091.57,0.0,6360674.41],["CEF / MOB","FEV",2025,"INTERNA",112268.03,155125.47,77562.73,344956.23],["BNDES / PEF I I","FEV",2025,"INTERNA",1345073.77,661754.17,0.0,2006827.94],["BNDES/ ESTADOS A","FEV",2025,"INTERNA",6788110.21,2440505.12,0.0,9228615.33],["BNDES/ ESTADOS B","FEV",2025,"INTERNA",7462082.3,3247619.26,0.0,10709701.56],["BNDES/ ESTADOS C","FEV",2025,"INTERNA",7320137.08,3739901.95,0.0,11060039.03],["BNDES / PROINVESTE","FEV",2025,"INTERNA",3560166.45,5119895.93,0.0,8680062.38],["LEI 9496 REGOV","FEV",2025,"INTERNA",14929655.36,1954217.72,53937.51,16937810.59],["REFINANCIAMENTO 281/CAF","MAR",2025,"INTERNA",599330.08,1191895.66,18164.24,1809389.98],["CEF / FINISA","MAR",2025,"INTERNA",4615582.84,1655878.55,0.0,6271461.39],["CEF / MOB","MAR",2025,"INTERNA",112978.75,154768.77,77384.38,345131.9],["BNDES / PEF I I","MAR",2025,"INTERNA",1347001.6,554819.65,0.0,1901821.25],["BNDES/ ESTADOS A","MAR",2025,"INTERNA",6797839.27,2036347.64,0.0,8834186.91],["BNDES/ ESTADOS B","MAR",2025,"INTERNA",7472777.34,2718215.96,0.0,10190993.3],["BNDES/ ESTADOS C","MAR",2025,"INTERNA",7330628.69,3137070.01,0.0,10467698.7],["BNDES / PROINVESTE","MAR",2025,"INTERNA",3565269.06,4329235.09,0.0,7894504.15],["LEI 9496 REGOV","MAR",2025,"INTERNA",15089767.73,1916851.38,53711.77,17060330.88],["BID/PROFISCO I (MAR-SET)","MAR",2025,"EXTERNA",2471763.06,856095.77,1100.0,3328958.83],["BID/PROFISCO II (MAR-SET)","MAR",2025,"EXTERNA",5281243.42,5963724.9,1100.0,11246068.32],["REFINANCIAMENTO 281/CAF","ABR",2025,"INTERNA",605235.28,1197629.85,18267.15,1821132.28],["CEF / FINISA","ABR",2025,"INTERNA",4615582.84,1653835.01,0.0,6269417.85],["CEF / MOB","ABR",2025,"INTERNA",113667.64,154372.27,77186.13,345226.04],["BNDES / PEF I I","ABR",2025,"INTERNA",1349330.6,568206.68,0.0,1917537.28],["BNDES/ ESTADOS A","ABR",2025,"INTERNA",6809592.9,2075191.69,0.0,8884784.59],["BNDES/ ESTADOS B","ABR",2025,"INTERNA",7485697.95,2778954.8,0.0,10264652.75],["BNDES/ ESTADOS C","ABR",2025,"INTERNA",7343303.51,3214348.4,0.0,10557651.91],["BNDES / PROINVESTE","ABR",2025,"INTERNA",3571433.5,4472242.94,0.0,8043676.44],["LEI 9496 REGOV","ABR",2025,"INTERNA",15237588.0,1880351.32,53439.37,17171378.69],["REFINANCIAMENTO 281/CAF","MAI",2025,"INTERNA",611069.92,1203128.02,18366.7,1832564.64],["CEF / FINISA","MAI",2025,"INTERNA",4615582.84,1576432.02,0.0,6192014.86],["CEF / MOB","MAI",2025,"INTERNA",114428.92,154063.7,77031.85,345524.47],["BNDES / PEF I I","MAI",2025,"INTERNA",1352110.0,581316.08,0.0,1933426.08],["BNDES/ ESTADOS A","MAI",2025,"INTERNA",6823619.55,2112261.17,0.0,8935880.72],["BNDES/ ESTADOS B","MAI",2025,"INTERNA",7501117.26,2837977.45,0.0,10339094.71],["BNDES/ ESTADOS C","MAI",2025,"INTERNA",7358429.52,3290173.42,0.0,10648602.94],["BNDES / PROINVESTE","MAI",2025,"INTERNA",3578790.07,4615914.88,0.0,8194704.95],["LEI 9496 REGOV","MAI",2025,"INTERNA",15378345.02,1838538.8,52790.58,17269674.4],["REFINANCIAMENTO 281/CAF","JUN",2025,"INTERNA",617521.8,1209740.18,18483.52,1845745.5],["CEF / FINISA","JUN",2025,"INTERNA",4615582.84,1727277.9,0.0,6342860.74],["CEF / MOB","JUN",2025,"INTERNA",115197.95,153754.34,76877.17,345829.46],["BB/PROG.MAIS JUSTO (JUN-DEZ)","JUN",2025,"INTERNA",4266479.1,1045984.88,0.0,5312463.98],["BNDES / PEF I I","JUN",2025,"INTERNA",1355081.0,613264.16,0.0,1968345.16],["BNDES/ ESTADOS A","JUN",2025,"INTERNA",6838613.15,2216636.65,0.0,9055249.8],["BNDES/ ESTADOS B","JUN",2025,"INTERNA",7517599.54,2988430.42,0.0,10506029.96],["BNDES/ ESTADOS C","JUN",2025,"INTERNA",7374598.26,3472799.39,0.0,10847397.65],["BNDES / PROINVESTE","JUN",2025,"INTERNA",3586653.78,4913467.39,0.0,8500121.17],["BB CONTRATO 40/00058-3","JUN",2025,"INTERNA",0.0,7943551.44,0.0,7943551.44],["LEI 9496 REGOV","JUN",2025,"INTERNA",15557414.1,1803883.66,51959.23,17413256.99],["REFINANCIAMENTO 281/CAF","JUL",2025,"INTERNA",624553.58,1217375.83,18616.27,1860545.68],["CEF / FINISA","JUL",2025,"INTERNA",4615582.84,1685970.65,0.0,6301553.49],["CEF / MOB","JUL",2025,"INTERNA",115970.64,153438.6,76719.3,346128.54],["BNDES / PEF I I","JUL",2025,"INTERNA",1357929.56,549255.59,0.0,1907185.15],["BNDES/ ESTADOS A","JUL",2025,"INTERNA",6852988.83,1974502.78,0.0,8827491.61],["BNDES/ ESTADOS B","JUL",2025,"INTERNA",7533402.54,2671440.64,0.0,10204843.18],["BNDES/ ESTADOS C","JUL",2025,"INTERNA",7516063.98,3183393.38,0.0,10699457.36],["BNDES / PROINVESTE","JUL",2025,"INTERNA",3594193.4,4440999.11,0.0,8035192.51],["BNDES FINEM A - 23.203.181 017","JUL",2025,"INTERNA",0.0,58733.67,0.0,58733.67],["BB CONTRATO 40/00058-3","JUL",2025,"INTERNA",0.0,8826395.93,0.0,8826395.93],["LEI 9496 REGOV","JUL",2025,"INTERNA",15743115.98,1765231.67,51110.09,17559457.74],["REFINANCIAMENTO 281/CAF","AGO",2025,"INTERNA",631404.74,1224543.59,18742.17,1874690.5],["CEF / FINISA","AGO",2025,"INTERNA",4615582.84,1795585.61,0.0,6411168.45],["CEF / MOB","AGO",2025,"INTERNA",116755.38,153127.47,76563.73,346446.58],["BNDES / PEF I I","AGO",2025,"INTERNA",1361153.92,580578.09,0.0,1941732.01],["BNDES/ ESTADOS A","AGO",2025,"INTERNA",6869261.01,2075396.58,0.0,8944657.59],["BNDES/ ESTADOS B","AGO",2025,"INTERNA",7551290.34,2818270.15,0.0,10369560.49],["BNDES/ ESTADOS C","AGO",2025,"INTERNA",7533910.59,3347361.6,0.0,10881272.19],["BNDES / PROINVESTE","AGO",2025,"INTERNA",3602727.69,4738111.92,0.0,8340839.61],["BB CONTRATO 40/00058-3","AGO",2025,"INTERNA",0.0,8826395.68,0.0,8826395.68],["LEI 9496 REGOV","AGO",2025,"INTERNA",15905777.9,1722809.74,50158.69,17678746.33],["REFINANCIAMENTO 281/CAF","SET",2025,"INTERNA",4927873.6,2543731.23,36330.77,7507935.6],["CEF / FINISA","SET",2025,"INTERNA",4615582.84,1576392.05,0.0,6191974.89],["CEF / MOB","SET",2025,"INTERNA",117541.22,152806.37,76403.19,346750.78],["BNDES / PEF I I","SET",2025,"INTERNA",1364385.93,573873.91,0.0,1938259.84],["BNDES/ ESTADOS A","SET",2025,"INTERNA",6885571.83,2039533.87,0.0,8925105.7],["BNDES/ ESTADOS B","SET",2025,"INTERNA",7569220.61,2780121.37,0.0,10349341.98],["BNDES/ ESTADOS C","SET",2025,"INTERNA",7551799.6,3310572.35,0.0,10862371.95],["BNDES / PROINVESTE","SET",2025,"INTERNA",3611282.24,4727968.89,0.0,8339251.13],["BB CONTRATO 40/00058-3","SET",2025,"INTERNA",0.0,8826395.22,0.0,8826395.22],["LEI 9496 REGOV","SET",2025,"INTERNA",16143968.83,1692930.54,41159.59,17878058.96],["BID/PROFISCO I (MAR-SET)","SET",2025,"EXTERNA",2284147.31,718833.67,1100.0,3004080.98],["BID/PROFISCO II (MAR-SET)","SET",2025,"EXTERNA",4883885.84,5164470.46,1100.0,10049456.3],["REFINANCIAMENTO 281/CAF","OUT",2025,"INTERNA",2580046.21,4953423.5,36631.57,7570101.28],["CEF / FINISA","OUT",2025,"INTERNA",4615582.84,1585400.0,0.0,6200982.84],["CEF / MOB","OUT",2025,"INTERNA",118334.71,152483.83,76241.91,347060.45],["BNDES / PEF I I","OUT",2025,"INTERNA",1367574.65,548767.19,0.0,1916341.84],["BNDES/ ESTADOS A","OUT",2025,"INTERNA",6901664.19,1938603.33,0.0,8840267.52],["BNDES/ ESTADOS B","OUT",2025,"INTERNA",7586910.73,2652979.29,0.0,10239890.02],["BNDES/ ESTADOS C","OUT",2025,"INTERNA",7569449.02,3167569.7,0.0,10737018.72],["BNDES / PROINVESTE","OUT",2025,"INTERNA",3619722.21,4564959.97,0.0,8184682.18],["BNDES FINEM A - 23.203.181 017","OUT",2025,"INTERNA",0.0,998459.57,0.0,998459.57],["BB CONTRATO 40/00058-3","OUT",2025,"INTERNA",0.0,8826396.19,0.0,8826396.19],["LEI 9496 REGOV","OUT",2025,"INTERNA",16310312.61,1648641.01,40077.81,17999031.43],["REFINANCIAMENTO 281/CAF","NOV",2025,"INTERNA",2611519.65,4988515.8,36955.25,7636990.7],["CEF / FINISA","NOV",2025,"INTERNA",4615582.84,1519341.67,0.0,6134924.51],["CEF / MOB","NOV",2025,"INTERNA",119135.45,152159.18,76079.59,347374.22],["BNDES / PEF I I","NOV",2025,"INTERNA",1371158.5,596750.42,0.0,1967908.92],["BNDES/ ESTADOS A","NOV",2025,"INTERNA",6919750.57,2095017.52,0.0,9014768.09],["BNDES/ ESTADOS B","NOV",2025,"INTERNA",7606792.86,2878782.3,0.0,10485575.16],["BNDES/ ESTADOS C","NOV",2025,"INTERNA",7589285.39,3446587.93,0.0,11035873.32],["BNDES / PROINVESTE","NOV",2025,"INTERNA",3629207.99,5013164.5,0.0,8642372.49],["BB CONTRATO 40/00058-3","NOV",2025,"INTERNA",0.0,8019179.49,0.0,8019179.49],["LEI 9496 REGOV","NOV",2025,"INTERNA",16512639.55,1606548.04,39055.22,18158242.81],["REFINANCIAMENTO 281/CAF","DEZ",2025,"INTERNA",2644833.87,5026581.12,37302.35,7708717.34],["CEF / FINISA","DEZ",2025,"INTERNA",4615582.84,1321166.67,0.0,5936749.51],["CEF / MOB","DEZ",2025,"INTERNA",119926.77,151811.16,75905.58,347643.51],["BB/PROG.MAIS JUSTO (JUN-DEZ)","DEZ",2025,"INTERNA",4037305.15,989799.81,0.0,5027104.96],["BNDES / PEF I I","DEZ",2025,"INTERNA",1374206.7,499866.43,0.0,1874073.13],["BNDES/ ESTADOS A","DEZ",2025,"INTERNA",6935133.76,1743595.35,0.0,8678729.11],["BNDES/ ESTADOS B","DEZ",2025,"INTERNA",7623703.4,2406085.23,0.0,10029788.63],["BNDES/ ESTADOS C","DEZ",2025,"INTERNA",7606157.01,2888794.42,0.0,10494951.43],["BNDES / PROINVESTE","DEZ",2025,"INTERNA",3637276.03,4241561.39,0.0,7878837.42],["LEI 9496 REGOV","DEZ",2025,"INTERNA",16696802.59,1550077.14,37935.91,18284815.64],["CEF / FINISA","JAN",2024,"INTERNA",4615582.84,2071569.7,0.0,6687152.54],["CEF / MOB","JAN",2024,"INTERNA",104193.91,160592.62,80296.31,345082.84],["BNDES / PEF I I","JAN",2024,"INTERNA",1330794.55,717419.72,0.0,2048214.27],["BNDES/ ESTADOS A","JAN",2024,"INTERNA",6716048.06,2785048.35,0.0,9501096.41],["BNDES/ ESTADOS B","JAN",2024,"INTERNA",7382865.31,3586408.06,0.0,10969273.37],["BNDES/ ESTADOS C","JAN",2024,"INTERNA",7228570.62,4020602.17,0.0,11249172.79],["BNDES / PROINVESTE","JAN",2024,"INTERNA",3522371.95,5028901.86,0.0,8551273.81],["BB CONTRATO 40/00058-3","JAN",2024,"INTERNA",0.0,8422666.47,0.0,8422666.47],["LEI 9496 REGOV","JAN",2024,"INTERNA",13341689.0,2411903.79,57596.34,15811189.13],["REFINANCIAMENTO 281/CAF","FEV",2024,"INTERNA",535122.29,1134912.1,16702.59,1686736.98],["CEF / FINISA","FEV",2024,"INTERNA",4615582.84,2410795.24,0.0,7026378.08],["CEF / MOB","FEV",2024,"INTERNA",104806.5,160211.71,80105.85,345124.06],["BNDES / PEF I I","FEV",2024,"INTERNA",1331366.23,709840.79,0.0,2041207.02],["BNDES/ ESTADOS A","FEV",2024,"INTERNA",6718933.11,2746441.24,0.0,9465374.35],["BNDES/ ESTADOS B","FEV",2024,"INTERNA",7386036.81,3544193.22,0.0,10930230.03],["BNDES/ ESTADOS C","FEV",2024,"INTERNA",7231675.81,3984215.31,0.0,11215891.12],["BNDES / PROINVESTE","FEV",2024,"INTERNA",3523885.07,5010186.38,0.0,8534071.45],["LEI 9496 REGOV","FEV",2024,"INTERNA",13460605.4,2382180.74,57371.23,15900157.37],["REFINANCIAMENTO 281/CAF","MAR",2024,"INTERNA",540294.97,1140280.67,17207.82,1697783.46],["CEF / FINISA","MAR",2024,"INTERNA",4615582.84,1866977.59,0.0,6482560.43],["CEF / MOB","MAR",2024,"INTERNA",105338.86,159700.29,79850.15,344889.3],["BNDES / PEF I I","MAR",2024,"INTERNA",1331901.25,656804.94,0.0,1988706.19],["BNDES/ ESTADOS A","MAR",2024,"INTERNA",6721633.15,2532550.41,0.0,9254183.56],["BNDES/ ESTADOS B","MAR",2024,"INTERNA",7389004.92,3275294.25,0.0,10664299.17],["BNDES/ ESTADOS C","MAR",2024,"INTERNA",7234581.89,3687870.37,0.0,10922452.26],["BNDES / PROINVESTE","MAR",2024,"INTERNA",3525301.16,4668404.79,0.0,8193705.95],["LEI 9496 REGOV","MAR",2024,"INTERNA",13589255.7,2345086.12,57146.54,15991488.36],["BID/PROFISCO I (MAR-SET)","MAR",2024,"EXTERNA",2133118.76,998962.43,1100.0,3133181.19],["BID/PROFISCO II (MAR-SET)","MAR",2024,"EXTERNA",0.0,4247080.74,120518.31,4367599.05],["REFINANCIAMENTO 281/CAF","ABR",2024,"INTERNA",544618.33,1143777.03,17304.28,1705699.64],["CEF / FINISA","ABR",2024,"INTERNA",4615582.84,1890876.55,0.0,6506459.39],["CEF / MOB","ABR",2024,"INTERNA",105900.59,159226.29,79613.14,344740.02],["BNDES / PEF I I","ABR",2024,"INTERNA",1332541.45,694679.21,0.0,2027220.66],["BNDES/ ESTADOS A","ABR",2024,"INTERNA",6724864.05,2669188.31,0.0,9394052.36],["BNDES/ ESTADOS B","ABR",2024,"INTERNA",7392556.61,3459733.56,0.0,10852290.17],["BNDES/ ESTADOS C","ABR",2024,"INTERNA",7238059.37,3901974.59,0.0,11140033.96],["BNDES / PROINVESTE","ABR",2024,"INTERNA",3526995.68,4972820.56,0.0,8499816.24],["LEI 9496 REGOV","ABR",2024,"INTERNA",13687180.0,2315478.04,56831.05,16059489.09],["REFINANCIAMENTO 281/CAF","MAI",2024,"INTERNA",549147.31,1147632.62,17346.34,1714126.27],["CEF / FINISA","MAI",2024,"INTERNA",4615582.84,1883592.53,0.0,6499175.37],["CEF / MOB","MAI",2024,"INTERNA",106538.98,158859.13,79429.56,344827.67],["BNDES / PEF I I","MAI",2024,"INTERNA",1333241.32,664916.43,0.0,1998157.75],["BNDES/ ESTADOS A","MAI",2024,"INTERNA",6728396.01,2545625.6,0.0,9274021.61],["BNDES/ ESTADOS B","MAI",2024,"INTERNA",7396439.25,3307168.69,0.0,10703607.94],["BNDES/ ESTADOS C","MAI",2024,"INTERNA",7241860.87,3736213.96,0.0,10978074.83],["BNDES / PROINVESTE","MAI",2024,"INTERNA",3528848.09,4794246.5,0.0,8323094.59],["LEI 9496 REGOV","MAI",2024,"INTERNA",13800819.56,2277701.39,56535.46,16135056.41],["REFINANCIAMENTO 281/CAF","JUN",2024,"INTERNA",555610.0,1152930.0,17415.0,1725955.0],["CEF / FINISA","JUN",2024,"INTERNA",4615582.84,1806351.55,0.0,6421934.39],["CEF / MOB","JUN",2024,"INTERNA",107164.82,158464.18,79232.09,344861.09],["BB/PROG.MAIS JUSTO (JUN-DEZ)","JUN",2024,"INTERNA",4623042.98,1165037.89,0.0,5788080.87],["BNDES / PEF I I","JUN",2024,"INTERNA",1334011.59,723625.79,0.0,2057637.38],["BNDES/ ESTADOS A","JUN",2024,"INTERNA",6732283.31,2760143.89,0.0,9492427.2],["BNDES/ ESTADOS B","JUN",2024,"INTERNA",7400712.52,3594348.98,0.0,10995061.5],["BNDES/ ESTADOS C","JUN",2024,"INTERNA",7259934.69,4073348.01,0.0,11333282.7],["BNDES / PROINVESTE","JUN",2024,"INTERNA",3530886.87,5255956.82,0.0,8786843.69],["LEI 9496 REGOV","JUN",2024,"INTERNA",13929994.43,2244929.92,56304.12,16231228.47],["REFINANCIAMENTO 281/CAF","JUL",2024,"INTERNA",558595.23,1155928.1,17499.84,1732023.17],["CEF / FINISA","JUL",2024,"INTERNA",4615582.84,1751656.13,0.0,6367238.97],["CEF / MOB","JUL",2024,"INTERNA",107739.96,157986.0,78993.0,344718.96],["BNDES / PEF I I","JUL",2024,"INTERNA",1334782.16,606907.24,0.0,1941689.4],["BNDES/ ESTADOS A","JUL",2024,"INTERNA",6736172.1,2306142.56,0.0,9042314.66],["BNDES/ ESTADOS B","JUL",2024,"INTERNA",7404987.41,3010446.54,0.0,10415433.95],["BNDES/ ESTADOS C","JUL",2024,"INTERNA",7264128.28,3419472.99,0.0,10683601.27],["BNDES / PROINVESTE","JUL",2024,"INTERNA",3532926.42,4441150.17,0.0,7974076.59],["LEI 9496 REGOV","JUL",2024,"INTERNA",14041528.82,2210656.01,55998.12,16308182.95],["REFINANCIAMENTO 281/CAF","AGO",2024,"INTERNA",563035.31,1159374.79,17566.26,1739976.36],["CEF / FINISA","AGO",2024,"INTERNA",4615582.84,1869288.72,0.0,6484871.56],["CEF / MOB","AGO",2024,"INTERNA",108358.68,157563.65,78781.83,344704.16],["BNDES / PEF I I","AGO",2024,"INTERNA",1335765.06,664707.03,0.0,2000472.09],["BNDES/ ESTADOS A","AGO",2024,"INTERNA",6741132.43,2515905.43,0.0,9257037.86],["BNDES/ ESTADOS B","AGO",2024,"INTERNA",7410440.23,3292502.98,0.0,10702943.21],["BNDES/ ESTADOS C","AGO",2024,"INTERNA",7269477.38,3746651.92,0.0,11016129.3],["BNDES / PROINVESTE","AGO",2024,"INTERNA",3535527.97,4901071.5,0.0,8436599.47],["LEI 9496 REGOV","AGO",2024,"INTERNA",14146413.94,2172771.53,55649.73,16374835.2],["REFINANCIAMENTO 281/CAF","SET",2024,"INTERNA",568142.26,1164116.58,17652.5,1749911.34],["CEF / FINISA","SET",2024,"INTERNA",4615582.84,1661827.61,0.0,6277410.45],["CEF / MOB","SET",2024,"INTERNA",108977.46,157132.87,78566.43,344676.76],["BNDES / PEF I I","SET",2024,"INTERNA",1336780.42,678560.81,0.0,2015341.23],["BNDES/ ESTADOS A","SET",2024,"INTERNA",6746256.6,2558027.14,0.0,9304283.74],["BNDES/ ESTADOS B","SET",2024,"INTERNA",7416073.16,3356265.66,0.0,10772338.82],["BNDES/ ESTADOS C","SET",2024,"INTERNA",7275003.14,3826328.41,0.0,11101331.55],["BNDES / PROINVESTE","SET",2024,"INTERNA",3538215.45,5041860.2,0.0,8580075.65],["LEI 9496 REGOV","SET",2024,"INTERNA",14293007.4,2142214.06,55460.12,16490681.58],["BID/PROFISCO I (MAR-SET)","SET",2024,"EXTERNA",2323712.53,1018508.48,1100.0,3343321.01],["BID/PROFISCO II (MAR-SET)","SET",2024,"EXTERNA",3820012.43,5033181.21,119401.25,8972594.89],["REFINANCIAMENTO 281/CAF","OUT",2024,"INTERNA",573070.94,1168410.45,17732.16,1759213.55],["CEF / FINISA","OUT",2024,"INTERNA",4615582.84,1709754.7,0.0,6325337.54],["CEF / MOB","OUT",2024,"INTERNA",109596.28,156693.68,78346.84,344636.8],["BNDES / PEF I I","OUT",2024,"INTERNA",1337953.69,607896.04,0.0,1945849.73],["BNDES/ ESTADOS A","OUT",2024,"INTERNA",6752177.71,2282170.46,0.0,9034348.17],["BNDES/ ESTADOS B","OUT",2024,"INTERNA",7422582.17,3002287.33,0.0,10424869.5],["BNDES/ ESTADOS C","OUT",2024,"INTERNA",7281388.36,3429315.96,0.0,10710704.32],["BNDES / PROINVESTE","OUT",2024,"INTERNA",3541320.9,4552266.17,0.0,8093587.07],["LEI 9496 REGOV","OUT",2024,"INTERNA",14409154.58,2102862.73,55129.28,16567146.59],["REFINANCIAMENTO 281/CAF","NOV",2024,"INTERNA",577856.65,1172333.88,17806.38,1767996.91],["CEF / FINISA","NOV",2024,"INTERNA",4615582.84,1761082.44,0.0,6376665.28],["CEF / MOB","NOV",2024,"INTERNA",110251.87,156298.26,78149.13,344699.26],["BNDES / PEF I I","NOV",2024,"INTERNA",1339648.07,705241.92,0.0,2044889.99],["BNDES/ ESTADOS A","NOV",2024,"INTERNA",6760728.61,2636374.67,0.0,9397103.28],["BNDES/ ESTADOS B","NOV",2024,"INTERNA",7431982.07,3477759.35,0.0,10909741.42],["BNDES/ ESTADOS C","NOV",2024,"INTERNA",7290609.44,3980205.53,0.0,11270814.97],["BNDES / PROINVESTE","NOV",2024,"INTERNA",3545805.6,5323402.2,0.0,8869207.8],["LEI 9496 REGOV","NOV",2024,"INTERNA",14524962.62,2064346.86,54792.6,16644102.08],["REFINANCIAMENTO 281/CAF","DEZ",2024,"INTERNA",583218.63,1177343.53,17897.33,1778459.49],["CEF / FINISA","DEZ",2024,"INTERNA",4615582.84,1388576.13,0.0,6004158.97],["CEF / MOB","DEZ",2024,"INTERNA",110875.04,155848.08,77924.04,344647.16],["BB/PROG.MAIS JUSTO (JUN-DEZ)","DEZ",2024,"INTERNA",4409890.57,1081144.13,0.0,5491034.7],["BNDES / PEF I I","DEZ",2024,"INTERNA",1341045.05,573886.96,0.0,1914932.01],["BNDES/ ESTADOS A","DEZ",2024,"INTERNA",6767778.67,2135950.38,0.0,8903729.05],["BNDES/ ESTADOS B","DEZ",2024,"INTERNA",7439732.1,2825586.76,0.0,10265318.86],["BNDES/ ESTADOS C","DEZ",2024,"INTERNA",7298212.03,3240317.55,0.0,10538529.58],["BNDES / PROINVESTE","DEZ",2024,"INTERNA",3549503.15,4367052.41,0.0,7916555.56],["BB CONTRATO 40/00058-3","DEZ",2024,"INTERNA",0.0,8422666.47,0.0,8422666.47],["LEI 9496 REGOV","DEZ",2024,"INTERNA",14672520.32,2029764.0,54564.96,16756849.28],["REFINANCIAMENTO 281/CAF","JAN",2026,"INTERNA",2672673.99,5053737.37,37569.76,7763981.12],["CEF / FINISA","JAN",2026,"INTERNA",4615582.84,1324169.32,0.0,5939752.16],["CEF / MOB","JAN",2026,"INTERNA",120736.36,151474.94,75737.47,347948.77],["BNDES / PEF I I","JAN",2026,"INTERNA",1377648.31,546807.01,0.0,1924455.32],["BNDES/ ESTADOS A","JAN",2026,"INTERNA",6952502.34,1894610.24,0.0,8847112.58],["BNDES/ ESTADOS B","JAN",2026,"INTERNA",7642796.46,2626039.12,0.0,10268835.58],["BNDES/ ESTADOS C","JAN",2026,"INTERNA",7632869.17,3165755.15,0.0,10798624.32],["BNDES / PROINVESTE","JAN",2026,"INTERNA",3646385.34,4687520.71,0.0,8333906.05],["BNDES FINEM A - 23.203.181 017","JAN",2026,"INTERNA",0.0,1865171.89,0.0,1865171.89],["BNDES FINEM B- 23.203.181 025","JAN",2026,"INTERNA",0.0,334347.78,0.0,334347.78],["BB CONTRATO 40/00058-3","JAN",2026,"INTERNA",0.0,8422666.47,0.0,8422666.47],["LEI 9496 REGOV","JAN",2026,"INTERNA",16878462.2,1521456.19,36843.15,18436761.54],["REFINANCIAMENTO 281/CAF","FEV",2026,"INTERNA",2705277.37,5089404.56,37901.73,7832583.66],["CEF / FINISA","FEV",2026,"INTERNA",4615582.84,1261113.64,0.0,5876696.48],["CEF / MOB","FEV",2026,"INTERNA",121548.5,151130.45,75565.23,348244.18],["BNDES / PEF I I","FEV",2026,"INTERNA",1381511.56,592598.9,0.0,1974110.46],["BNDES/ ESTADOS A","FEV",2026,"INTERNA",6971998.82,2039070.29,0.0,9011069.11],["BNDES/ ESTADOS B","FEV",2026,"INTERNA",7664228.69,2839263.43,0.0,10503492.12],["BNDES/ ESTADOS C","FEV",2026,"INTERNA",7654273.57,3432538.76,0.0,11086812.33],["BNDES / PROINVESTE","FEV",2026,"INTERNA",3656610.68,5133278.8,0.0,8789889.48],["BB CONTRATO 40/00058-3","FEV",2026,"INTERNA",6158036.34,8826396.44,0.0,14984432.78],["LEI 9496 REGOV","FEV",2026,"INTERNA",17109769.66,1479912.02,35792.9,18625474.58],["REFINANCIAMENTO 281/CAF","MAR",2026,"INTERNA",2736769.33,5122452.57,38215.55,7897437.45],["CEF / FINISA","MAR",2026,"INTERNA",4615582.84,1026906.82,0.0,5642489.66],["CEF / MOB","MAR",2026,"INTERNA",122303.69,150704.39,75352.2,348360.28],["BNDES / PEF I I","MAR",2026,"INTERNA",1384473.12,446913.41,0.0,1831386.53],["BNDES/ ESTADOS A","MAR",2026,"INTERNA",6986944.77,1526741.42,0.0,8513686.19],["BNDES/ ESTADOS B","MAR",2026,"INTERNA",7680658.58,2136052.81,0.0,9816711.39],["BNDES/ ESTADOS C","MAR",2026,"INTERNA",7670682.1,2590409.37,0.0,10261091.47],["BNDES / PROINVESTE","MAR",2026,"INTERNA",3664449.4,3912665.21,0.0,7577114.61],["BB CONTRATO 40/00058-3","MAR",2026,"INTERNA",6158036.34,7146142.53,0.0,13304178.87],["LEI 9496 REGOV","MAR",2026,"INTERNA",17301071.2,1434439.18,34627.43,18770137.81],["BID/PROFISCO I (MAR-SET)","MAR",2026,"EXTERNA",2229777.03,568915.75,0.0,2798692.78],["BID/PROFISCO II (MAR-SET)","MAR",2026,"EXTERNA",4686742.3,4344484.23,0.0,9031226.53],["REFINANCIAMENTO 281/CAF","ABR",2026,"INTERNA",2797555.0,5182934.1,38805.22,8019294.32],["CEF / FINISA","ABR",2026,"INTERNA",4615582.84,1234619.39,0.0,5850202.23],["CEF / MOB","ABR",2026,"INTERNA",123128.47,150353.28,75176.64,348658.39],["BNDES / PEF I I","ABR",2026,"INTERNA",1387868.53,509175.34,0.0,1897043.87],["BNDES/ ESTADOS A","ABR",2026,"INTERNA",7004080.2,1726468.33,0.0,8730548.53],["BNDES/ ESTADOS B","ABR",2026,"INTERNA",7699495.34,2427526.61,0.0,10127021.95],["BNDES/ ESTADOS C","ABR",2026,"INTERNA",7689494.4,2953327.68,0.0,10642822.08],["BNDES / PROINVESTE","ABR",2026,"INTERNA",3673436.43,4506354.5,0.0,8179790.93],["BNDES FINEM A - 23.203.181 017","ABR",2026,"INTERNA",0.0,3176132.16,0.0,3176132.16],["BNDES FINEM B- 23.203.181 025","ABR",2026,"INTERNA",0.0,1351819.75,0.0,1351819.75],["BB CONTRATO 40/00058-3","ABR",2026,"INTERNA",6158036.34,8064190.91,0.0,14222227.25],["LEI 9496 REGOV","ABR",2026,"INTERNA",17450128.29,1385971.8,33354.47,18869454.56],["REFINANCIAMENTO 281/CAF","MAI",2026,"INTERNA",2828049.67,5212628.28,39097.89,8079775.84],["CEF / FINISA","MAI",2026,"INTERNA",4615582.84,954642.53,0.0,5570225.37],["CEF / MOB","MAI",2026,"INTERNA",123951.88,149989.05,74994.53,348935.46],["BNDES / PEF I I","MAI",2026,"INTERNA",1391238.29,502436.43,0.0,1893674.72],["BNDES/ ESTADOS A","MAI",2026,"INTERNA",7021086.14,1690412.29,0.0,8711498.43],["BNDES/ ESTADOS B","MAI",2026,"INTERNA",7718189.75,2389176.65,0.0,10107366.4],["BNDES/ ESTADOS C","MAI",2026,"INTERNA",7708164.53,2916311.84,0.0,10624476.37],["BNDES / PROINVESTE","MAI",2026,"INTERNA",3682355.55,4496187.08,0.0,8178542.63],["BB CONTRATO 40/00058-3","MAI",2026,"INTERNA",6158036.34,8064190.91,0.0,14222227.25],["LEI 9496 REGOV","MAI",2026,"INTERNA",17688207.79,1337431.94,32211.65,19057851.38],["REFINANCIAMENTO 281/CAF","JUN",2026,"INTERNA",2828049.67,5212628.28,39097.89,8079775.84],["CEF / FINISA","JUN",2026,"INTERNA",4615582.84,977204.03,0.0,5592786.87],["CEF / MOB","JUN",2026,"INTERNA",124781.79,149621.28,74810.64,349213.71],["BNDES / PEF I I","JUN",2026,"INTERNA",1394728.96,512274.12,0.0,1907003.08],["BNDES/ ESTADOS A","JUN",2026,"INTERNA",7038702.32,1709611.22,0.0,8748313.54],["BNDES/ ESTADOS B","JUN",2026,"INTERNA",7737554.99,2429408.36,0.0,10166963.35],["BNDES/ ESTADOS C","JUN",2026,"INTERNA",7727504.61,2975593.04,0.0,10703097.65],["BNDES / PROINVESTE","JUN",2026,"INTERNA",3691594.73,4636292.02,0.0,8327886.75],["BB CONTRATO 40/00058-3","JUN",2026,"INTERNA",6158036.34,7497871.26,0.0,13655907.6],["CEF / FINISA","JUL",2026,"INTERNA",4615582.84,909032.7,0.0,5524615.54],["CEF / MOB","JUL",2026,"INTERNA",125620.01,149252.01,74626.0,349498.02],["BNDES / PEF I I","JUL",2026,"INTERNA",1398120.35,488892.57,0.0,1887012.92],["BNDES/ ESTADOS A","JUL",2026,"INTERNA",7055817.46,1617880.27,0.0,8673697.73],["BNDES/ ESTADOS B","JUL",2026,"INTERNA",7756369.45,2312069.48,0.0,10068438.93],["BNDES/ ESTADOS C","JUL",2026,"INTERNA",7746294.65,2841927.76,0.0,10588222.41],["BNDES / PROINVESTE","JUL",2026,"INTERNA",3700571.12,4476001.89,0.0,8176573.01],["BNDES FINEM A - 23.203.181 017","JUL",2026,"INTERNA",0.0,4514548.46,0.0,4514548.46],["BNDES FINEM B- 23.203.181 025","JUL",2026,"INTERNA",0.0,3641146.31,0.0,3641146.31],["BB CONTRATO 40/00058-3","JUL",2026,"INTERNA",6158036.34,7972268.61,0.0,14130304.95],["PROPAG (LEI 9496 + 281/2022/CAF)","JUL",2026,"INTERNA",5422982.66,0.0,37362.33,5460344.99],["CEF / FINISA","AGO",2026,"INTERNA",4615582.84,881199.75,0.0,5496782.59],["CEF / MOB","AGO",2026,"INTERNA",126466.4,148880.88,74440.44,349787.72],["BNDES / PEF I I","AGO",2026,"INTERNA",1401866.68,530534.88,0.0,1932401.56],["BNDES/ ESTADOS A","AGO",2026,"INTERNA",7074723.88,1740323.9,0.0,8815047.78],["BNDES/ ESTADOS B","AGO",2026,"INTERNA",7777153.03,2501766.67,0.0,10278919.7],["BNDES/ ESTADOS C","AGO",2026,"INTERNA",7767051.24,3086403.46,0.0,10853454.7],["BNDES / PROINVESTE","AGO",2026,"INTERNA",3710486.99,4914803.86,0.0,8625290.85],["BB CONTRATO 40/00058-3","AGO",2026,"INTERNA",6158036.34,7440022.62,0.0,13598058.96],["PROPAG (LEI 9496 + 281/2022/CAF)","AGO",2026,"INTERNA",5421404.46,155954.62,0.0,5577359.08],["REFINANCIAMENTO 281/CAF","SET",2026,"INTERNA",0.0,0.0,5578904.47,5578904.47],["CEF / FINISA","SET",2026,"INTERNA",4615582.84,806546.52,0.0,5422129.36],["CEF / MOB","SET",2026,"INTERNA",127313.91,148499.53,74249.76,350063.2],["BNDES / PEF I I","SET",2026,"INTERNA",1405167.2,459361.29,0.0,1864528.49],["BNDES/ ESTADOS A","SET",2026,"INTERNA",7091380.43,1493099.54,0.0,8584479.97],["BNDES/ ESTADOS B","SET",2026,"INTERNA",7795463.36,2159664.66,0.0,9955128.02],["BNDES/ ESTADOS C","SET",2026,"INTERNA",7785337.78,2674505.69,0.0,10459843.47],["BNDES / PROINVESTE","SET",2026,"INTERNA",3719222.87,4306980.15,0.0,8026203.02],["BB CONTRATO 40/00058-3","SET",2026,"INTERNA",6158036.34,0.0,0.0,6158036.34],["PROPAG (LEI 9496 + 281/2022/CAF)","SET",2026,"INTERNA",5423054.46,0.0,155715.37,5578769.83],["CEF / FINISA","OUT",2026,"INTERNA",4615582.84,702762.29,0.0,5318345.13],["CEF / MOB","OUT",2026,"INTERNA",128166.71,148112.85,74056.42,350335.98]],"saldo2025":{"meses":["2025-01","2025-02","2025-03","2025-04","2025-05","2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12"],"rows":[["BNDES A - 12214421 019",[387766306.05,381146122.05,375148370.51,369150078.18,363154363.66,356900288.84]],["BNDES A - 12214421 019",[350998925.17,344933686.17,338747193.54,0.0,0.0,0.0]],["BNDES B  - 12214421 027",[516006835.4,508772397.23,502373043.32,495980144.2,489598303.33,482874954.08]],["BNDES B  - 12214421 027",[476636514.48,470184647.91,463575644.61,0.0,0.0,0.0]],["BNDES C  - 12214421 035",[594224512.05,587169915.02,581082499.81,575008331.79,568953079.7,572112548.42]],["BNDES C  - 12214421 035",[566118462.14,559896521.52,553494016.47,0.0,0.0,0.0]],["BNDES PEF II  -  10204281 013",[105144615.13,103846394.53,102719095.46,101593912.89,100471835.49,99280426.71]],["BNDES PEF II  -  10204281 013",[98189562.76,97055728.36,95890345.85,0.0,0.0,0.0]],["BNDES PROINVESTE - 12210761 010",[813488615.29,810309170.91,808481771.73,806702014.73,804979525.5,802730634.86]],["BNDES PROINVESTE - 12210761 010",[801327419.48,799611989.7,797670856.73,0.0,0.0,0.0]],["BNDES FINEM - 23.203.181 017",[0.0,0.0,0.0,0.0,0.0,10004881.35]],["BNDES FINEM - 23.203.181 017",[10055643.08,50386123.88,50825881.55,0.0,0.0,0.0]],["LEI 9496",[653535689.65,642889249.71,632555961.01,621832067.79,610763655.96,600026382.03]],["LEI 9496",[589535062.79,481754311.93,470280208.43,0.0,0.0,0.0]],["BB STN/UNIÃO (GARANTIDOR) 281/CAF",[353647347.18,355162120.39,356969368.84,358683720.52,360327336.47,362304531.82]],["BB STN/UNIÃO (GARANTIDOR) 281/CAF1",[364588196.72,1481295393.82,0.0,0.0,0.0,0.0]],["CEF/FINISA",[147698651.79,143083068.95,138467486.11,133851903.27,129236320.43,124620737.59]],["CEF/FINISA",[120005154.75,115389571.91,110773989.07,0.0,0.0,0.0]],["CEF/MOB",[30972749.49,30912825.41,30840775.24,30760785.72,30698311.77,30635669.34]],["CEF/MOB",[30571748.7,30508738.46,30443733.28,0.0,0.0,0.0]],["BB/Prog.Mais Justo e Comp. I",[9343947.56,9456544.64,9555524.83,9688297.86,9790898.26,4623043.0]],["BB/Prog.Mais Justo  nº 20/17000",[4686135.06,4750572.71,4822164.38,0.0,0.0,0.0]],["BB/CONTRATO Nº 40/00058-3",[0.0,0.0,0.0,0.0,0.0,665067925.53]],["BB/CONTRATO Nº 40/00058-3",[665067925.53,665067925.53,665067925.53,0.0,0.0,0.0]],["BID / PROFISCO I",[29763771.02,29859238.08,29315024.77,26491173.75,26715334.15,25537907.05]],["BID / PROFISCO I",[26216471.96,25394238.49,24889760.58,0.0,0.0,0.0]],["BID / PROFISCO II",[204053499.99,204707999.99,200976999.99,183268400.0,184819162.5,176673612.5]],["BID / PROFISCO II",[181367987.5,175679700.0,172189675.0,0.0,0.0,0.0]],["DÍVIDA INTERNA",[3611829269.59,3572747808.84,3538193896.86,3503251256.95,3467973630.57,4111182023.57]],["DÍVIDA INTERNA",[4077780750.66,5100835211.9,3581591959.44,0.0,0.0,0.0]],["DÍVIDA EXTERNA",[233817271.01,234567238.07,230292024.77,209759573.75,211534496.65,202211519.55]],["DÍVIDA EXTERNA",[207584459.46,201073938.49,197079435.58,0.0,0.0,0.0]],["TOTAL GERAL",[3845646540.6,3807315046.91,3768485921.63,3713010830.7,3679508127.22,4313393543.12]],["TOTAL GERAL",[4285365210.12,5301909150.39,3778671395.02,0.0,0.0,0.0]],["BNDES TOTAL",[2416630883.92,2391243999.74,2369804780.83,2348434481.79,2327157107.68,2313898852.91]],["BNDES TOTAL",[2293270884.03,2271682573.66,2249378057.2,0.0,0.0,0.0]],["281 / CAF 1",[353647347.18,355162120.39,356969368.84,358683720.52,360327336.47,362304531.82]],["281 / CAF 1",[364588196.72,1481295393.82,0.0,0.0,0.0,0.0]],["BID PROFISCO I E II",[207584459.46,201073938.49,197079435.58,0.0,0.0,0.0]],["CEF   MOB E  FINISA",[150576903.45,145898310.37,141217722.35,0.0,0.0,0.0]]]},"proj":[["REFINANCIAMENTO 281/CAF",16568375.03,1380697.92,30873785.16,2572815.43,0.0,5809592.51],["CEF / FINISA",46155828.4,3846319.03,10078196.99,839849.75,0.0,0.0],["CEF / MOB",1244017.72,103668.14,1498018.66,124834.89,0.0,749009.33],["BB/PROG.MAIS JUSTO (JUN-DEZ)",0.0,0.0,0.0,0.0,0.0,0.0],["BNDES / PEF I I",12522623.0,1043551.92,4588993.95,382416.16,0.0,0.0],["BNDES/ ESTADOS A",63197236.36,5266436.36,15438217.5,1286518.12,0.0,0.0],["BNDES/ ESTADOS B",69471909.65,5789325.8,21820967.79,1818413.98,0.0,0.0],["BNDES/ ESTADOS C",69381672.05,5781806.0,26636772.75,2219731.06,0.0,0.0],["BNDES / PROINVESTE",33145113.11,2762092.76,41070084.22,3422507.02,0.0,0.0],["BNDES FINEM A - 23.203.181 017",0.0,0.0,9555852.51,796321.04,0.0,0.0],["BNDES FINEM B- 23.203.181 025",0.0,0.0,5327313.84,443942.82,0.0,0.0],["BB CONTRATO 40/00058-3",49264290.72,4105357.56,63433749.75,5286145.81,0.0,0.0],["LEI 9496 REGOV",86427639.14,7202303.26,7159211.13,596600.93,0.0,172829.6],["BID/PROFISCO I (MAR-SET)",2229777.03,185814.75,568915.75,47409.65,0.0,0.0],["BID/PROFISCO II (MAR-SET)",4686742.3,390561.86,4344484.23,362040.35,0.0,0.0],["PROPAG (LEI 9496 + 281/2022/CAF)",16267441.58,1355620.13,155954.62,12996.22,0.0,193077.7],["CONTRATO",0.0,0.0,0.0,0.0,0.0,0.0],["REFINANCIAMENTO 281/CAF",0.0,0.0,0.0,0.0,0.0,0.0],["CEF / FINISA",0.0,0.01,0.0,0.0,0.0,0.0],["CEF / MOB",0.0,0.0,0.0,0.0,0.0,0.0],["BB/PROG.MAIS JUSTO (JUN-DEZ)",0.0,0.0,0.0,0.0,0.0,0.0],["BNDES / PEF I I",0.0,0.0,0.0,0.0,0.0,0.0],["BNDES/ ESTADOS A",0.0,0.0,0.0,0.0,0.0,0.0],["BNDES/ ESTADOS B",0.0,0.0,0.0,0.0,0.0,0.0],["BNDES/ ESTADOS C",0.0,0.0,0.0,0.0,0.0,0.0],["BNDES / PROINVESTE",0.0,0.0,0.0,0.0,0.0,0.0],["BNDES FINEM A - 23.203.181 017",0.0,0.0,0.0,0.0,0.0,0.0],["BNDES FINEM B- 23.203.181 025",0.0,0.0,0.0,0.0,0.0,0.0],["BB CONTRATO 40/00058-3",0.0,0.0,0.0,0.0,0.0,0.0],["LEI 9496 REGOV",0.0,0.0,0.0,0.0,0.0,0.0],["BID/PROFISCO I (MAR-SET)",0.0,0.0,0.0,0.0,0.0,0.0],["BID/PROFISCO II (MAR-SET)",0.0,0.0,0.0,0.0,0.0,0.0],["PROPAG (LEI 9496 + 281/2022/CAF)",0.0,0.0,0.0,0.0,0.0,0.0]]}
+</script>
+<script>
+/* ============================================================================
+   PAINEL DE ESTOQUE E PAGAMENTO DA DÍVIDA PÚBLICA — SEPLAN MA
+   Lógica de dados, parsing da planilha e renderização. 100% client-side.
+   ========================================================================== */
+(function(){
+'use strict';
+
+/* ------------------------------ utilidades ------------------------------ */
+const $  = (s,r)=> (r||document).querySelector(s);
+const $$ = (s,r)=> Array.from((r||document).querySelectorAll(s));
+const nf2 = new Intl.NumberFormat('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const nf1 = new Intl.NumberFormat('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
+const nf0 = new Intl.NumberFormat('pt-BR',{maximumFractionDigits:0});
+const brl  = v => 'R$ ' + nf2.format(+v||0);
+const brl0 = v => 'R$ ' + nf0.format(+v||0);
+function compact(v){
+  v = +v||0; const a = Math.abs(v);
+  if(a>=1e9) return 'R$ ' + nf2.format(v/1e9) + ' Bi';
+  if(a>=1e6) return 'R$ ' + nf1.format(v/1e6) + ' Mi';
+  if(a>=1e3) return 'R$ ' + nf0.format(v/1e3) + ' mil';
+  return brl(v);
+}
+function short(v){
+  v = +v||0; const a = Math.abs(v);
+  if(a>=1e9) return nf2.format(v/1e9) + ' Bi';
+  if(a>=1e6) return nf1.format(v/1e6) + ' Mi';
+  if(a>=1e3) return nf0.format(v/1e3) + ' mil';
+  return nf0.format(v);
+}
+const pct = v => nf1.format(v*100) + '%';
+function toNum(v){
+  if(v===null||v===undefined||v==='') return 0;
+  if(typeof v==='number') return isFinite(v)?v:0;
+  if(v instanceof Date) return 0;
+  const s = String(v).trim();
+  if(!s || s==='-' || s.indexOf('#')===0) return 0;
+  if(s.indexOf(',')>-1 && s.indexOf('.')>-1) return parseFloat(s.replace(/\./g,'').replace(',','.'))||0;
+  if(s.indexOf(',')>-1) return parseFloat(s.replace(',','.'))||0;
+  const n = parseFloat(s.replace(/\s/g,''));
+  return isFinite(n)?n:0;
+}
+function cv(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function debounce(fn,ms){ let t; return function(){ const a=arguments; clearTimeout(t); t=setTimeout(()=>fn.apply(null,a),ms||180); }; }
+
+const MESES_PT = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+const MESES_LONGO = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+function credorOf(c){
+  const u = String(c||'').toUpperCase();
+  if(u.indexOf('BNDES')>-1) return 'BNDES';
+  if(u.indexOf('CEF')>-1) return 'Caixa Econômica';
+  if(u.indexOf('BID')>-1 || u.indexOf('PROFISCO')>-1) return 'BID';
+  if(u.indexOf('BB')>-1) return 'Banco do Brasil';
+  if(u.indexOf('LEI 9496')>-1 || u.indexOf('PROPAG')>-1 || u.indexOf('281')>-1 || u.indexOf('REFINANCIAMENTO')>-1) return 'Lei 9.496 / PROPAG';
+  return 'Outros';
+}
+function tipoLabel(t){
+  const u = String(t||'').toUpperCase();
+  if(u.indexOf('REESTRUT')>-1) return 'Reestruturação';
+  if(u==='INTERNA') return 'Interna';
+  if(u==='EXTERNA') return 'Externa';
+  return t || '—';
+}
+function tipoKey(t){
+  const u = String(t||'').toUpperCase();
+  if(u.indexOf('REESTRUT')>-1) return 'REESTRUTURACAO';
+  if(u==='EXTERNA') return 'EXTERNA';
+  if(u==='INTERNA') return 'INTERNA';
+  return 'OUTROS';
+}
+
+/* --------------------------- paleta de gráficos --------------------------- */
+function palette(){
+  return {
+    blue:   cv('--blue'),
+    orange: cv('--orange'),
+    slate:  cv('--slate'),
+    green:  cv('--green'),
+    navy:   cv('--navy-2') || cv('--navy'),
+    text:   cv('--text'),
+    muted:  cv('--muted'),
+    border: cv('--border'),
+    track:  cv('--track'),
+    card:   cv('--card')
+  };
+}
+const TIPO_COLOR = { INTERNA:'blue', EXTERNA:'orange', REESTRUTURACAO:'slate', OUTROS:'green' };
+
+/* ------------------------------- estado -------------------------------- */
+const SEED = JSON.parse($('#seed').textContent);
+const LS_DATA  = 'seplan.divida.base.v1';
+const LS_THEME = 'seplan.divida.tema.v1';
+let RAW = SEED, RAW_FROM_STORAGE = false;
+let ST = { ano:'', mes:'', tipo:'', credor:'', busca:'', sortK:3, sortDir:-1, page:1, pageSize:12 };
+
+/* ------------------------------ normalização ---------------------------- */
+function normalize(raw){
+  const d = { estoque:{}, pagamentos:[], saldo2025:{meses:[],rows:[]}, proj:[] };
+  if(!raw) return d;
+  if(raw.estoque) d.estoque = raw.estoque;
+  if(raw.pagamentos) d.pagamentos = raw.pagamentos;
+  if(raw.saldo2025) d.saldo2025 = raw.saldo2025;
+  if(raw.proj) d.proj = raw.proj;
+  return d;
+}
+function monthsOf(raw){
+  return Object.keys(raw.estoque||{}).filter(k=>/^\d{4}-\d{2}$/.test(k)).sort();
+}
+/* mês de referência = último mês com saldo >= 50% do máximo (ignora meses parciais) */
+function referenceMonth(raw){
+  const ms = monthsOf(raw);
+  if(!ms.length) return '';
+  const totals = ms.map(k => ({ k, v: (raw.estoque[k]||[]).reduce((s,r)=>s+(+r[2]||0),0) }));
+  const max = Math.max.apply(null, totals.map(t=>t.v));
+  if(!isFinite(max) || max<=0) return ms[ms.length-1];
+  for(let i=totals.length-1;i>=0;i--){ if(totals[i].v >= max*0.5) return totals[i].k; }
+  return ms[ms.length-1];
+}
+
+/* --------------------------- agregações do modelo ------------------------ */
+function buildView(){
+  const raw = RAW;
+  const ms = monthsOf(raw);
+  let refK = '';
+  if(ST.ano && ST.mes){ const k = ST.ano+'-'+ST.mes; if(ms.indexOf(k)>-1) refK = k; }
+  if(!refK) refK = referenceMonth(raw);
+  if(!refK && ms.length) refK = ms[ms.length-1];
+
+  const q = (ST.busca||'').trim().toLowerCase();
+  const match = r => {
+    const cr = credorOf(r[0]), tk = tipoKey(r[1]);
+    if(ST.tipo && tk !== ST.tipo) return false;
+    if(ST.credor && cr !== ST.credor) return false;
+    if(q && (String(r[0])+' '+r[1]+' '+cr).toLowerCase().indexOf(q)===-1) return false;
+    return true;
+  };
+
+  const rowsRef = (raw.estoque[refK]||[]).map(r=>[r[0], tipoKey(r[1]), +r[2]||0, credorOf(r[0])]);
+  const rows = rowsRef.filter(match);
+  const total = rows.reduce((s,r)=>s+r[2],0);
+
+  /* séries mensais (respeitam filtro de tipo/credor) */
+  const serie = ms.map(k=>{
+    const v = (raw.estoque[k]||[]).filter(match).reduce((s,r)=>s+(+r[2]||0),0);
+    return { k, v };
+  });
+  const idxRef = ms.indexOf(refK);
+  const serieHist = idxRef>=0 ? serie.slice(0, idxRef+1) : serie;
+  const serieProj = idxRef>=0 ? serie.slice(idxRef+1) : [];
+
+  /* mês anterior para variação */
+  let prevTotal = 0;
+  if(idxRef>0){ prevTotal = serie[idxRef-1] ? serie[idxRef-1].v : 0; }
+  const delta = prevTotal ? (total - prevTotal)/prevTotal : 0;
+
+  /* pagamentos */
+  const pg = (raw.pagamentos||[]).filter(p=>{
+    const cr = credorOf(p[0]), tk = tipoKey(p[3]);
+    if(ST.tipo && tk !== ST.tipo) return false;
+    if(ST.credor && cr !== ST.credor) return false;
+    if(q && (String(p[0])+' '+p[3]+' '+cr).toLowerCase().indexOf(q)===-1) return false;
+    return true;
+  });
+  const pgAno = {};
+  pg.forEach(p=>{
+    const a = p[2];
+    if(!pgAno[a]) pgAno[a] = { principal:0, juros:0, encargos:0, total:0 };
+    pgAno[a].principal += +p[4]||0;
+    pgAno[a].juros     += +p[5]||0;
+    pgAno[a].encargos  += +p[6]||0;
+    pgAno[a].total     += +p[7]||0;
+  });
+  const anos = Object.keys(pgAno).map(Number).sort();
+  const pgTotal = pg.reduce((s,p)=>s+(+p[7]||0),0);
+  const pgComp = { principal:0, juros:0, encargos:0 };
+  pg.forEach(p=>{ pgComp.principal+=+p[4]||0; pgComp.juros+=+p[5]||0; pgComp.encargos+=+p[6]||0; });
+
+  /* projeção de pagamentos por contrato */
+  const proj = (raw.proj||[]).filter(p=>{
+    const cr = credorOf(p[0]);
+    if(ST.credor && cr !== ST.credor) return false;
+    if(q && (String(p[0])+' '+cr).toLowerCase().indexOf(q)===-1) return false;
+    return true;
+  });
+
+  /* projeção do saldo: média mensal de pagamento (principal+juros+encargos) */
+  const projMediaMes = proj.reduce((s,p)=>s+(+p[2]||0)+(+p[4]||0)+(+p[6]||0),0);
+  const projSerie = [];
+  let bal = total;
+  for(let i=1;i<=Math.min(6, Math.max(0, ms.length - idxRef - 1)); i++){
+    bal -= projMediaMes;
+    projSerie.push({ k: ms[idxRef+i], v: Math.max(0, bal) });
+  }
+
+  return { ms, refK, idxRef, rows, rowsRef, total, serieHist, serieProj, projSerie, delta, prevTotal,
+           pg, pgAno, anos, pgTotal, pgComp, proj, projMediaMes, filtered: !!(ST.tipo||ST.credor||q) };
+}
+
+/* --------------------------- componentes de UI --------------------------- */
+function renderKPIs(V){
+  const P = palette();
+  const byTipo = { INTERNA:0, EXTERNA:0, REESTRUTURACAO:0, OUTROS:0 };
+  V.rows.forEach(r=>{ byTipo[r[1]] = (byTipo[r[1]]||0) + r[2]; });
+  const tot = V.total || 1;
+  const nC = V.rows.length;
+  const dSvg = V.delta>=0
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10M17 9v8H9"/></svg>';
+
+  const cards = [
+    { cls:'t-tot', label:'Saldo total devedor', value: compact(V.total),
+      foot:`<span class="pill ${V.delta>=0?'up':'down'}">${dSvg}${(V.delta>=0?'+':'')}${pct(V.delta)}</span><span class="k-note">vs. mês anterior</span>` },
+    { cls:'t-int', label:'Dívida interna', value: compact(byTipo.INTERNA),
+      foot:`<span class="pill blue">${pct(byTipo.INTERNA/tot)}</span><span class="k-note">do saldo total</span>` },
+    { cls:'t-ext', label:'Dívida externa', value: compact(byTipo.EXTERNA),
+      foot:`<span class="pill orange">${pct(byTipo.EXTERNA/tot)}</span><span class="k-note">do saldo total</span>` },
+    { cls:'t-res', label:'Reestruturação', value: compact(byTipo.REESTRUTURACAO),
+      foot:`<span class="pill gray">${pct(byTipo.REESTRUTURACAO/tot)}</span><span class="k-note">do saldo total</span>` },
+    { cls:'t-pag', label:'Pagamentos acumulados', value: compact(V.pgTotal),
+      foot:`<span class="pill green">${V.anos.length} anos</span><span class="k-note">principal + juros + encargos</span>` },
+    { cls:'t-n', label:'Contratos monitorados', value: nf0.format(nC),
+      foot:`<span class="pill gray">${new Set(V.rows.map(r=>r[3])).size} credores</span><span class="k-note">na competência selecionada</span>` }
+  ];
+  $('#kpis').innerHTML = cards.map(c=>`
+    <article class="kpi ${c.cls}">
+      <div class="k-label">${esc(c.label)}</div>
+      <div class="k-value">${c.value}</div>
+      <div class="k-foot">${c.foot}</div>
+    </article>`).join('');
+
+  $('#bnTotal').textContent = brl(V.total);
+  const [y,m] = (V.refK||'').split('-');
+  $('#bnSub').textContent = (m ? (MESES_LONGO[+m-1]+'/'+y) : '—') + ' · ' + nC + ' operações' + (V.filtered?' (filtrado)':'');
+  $('#tblCount').textContent = nC + ' contratos';
+  $('#footTotal').textContent = brl(V.total);
+  $('#projCount').textContent = V.proj.length + ' contratos';
+}
+
+/* ------------------------------- donut ---------------------------------- */
+function renderDonut(V){
+  const P = palette();
+  const byTipo = { INTERNA:0, EXTERNA:0, REESTRUTURACAO:0, OUTROS:0 };
+  V.rows.forEach(r=>{ byTipo[r[1]] = (byTipo[r[1]]||0) + r[2]; });
+  const segs = [
+    { key:'INTERNA', name:'Dívida interna', value:byTipo.INTERNA, color:P.blue },
+    { key:'EXTERNA', name:'Dívida externa', value:byTipo.EXTERNA, color:P.orange },
+    { key:'REESTRUTURACAO', name:'Reestruturação', value:byTipo.REESTRUTURACAO, color:P.slate },
+    { key:'OUTROS', name:'Outros', value:byTipo.OUTROS, color:P.green }
+  ].filter(s=>s.value>0);
+
+  const total = segs.reduce((s,x)=>s+x.value,0);
+  const C = 2*Math.PI*64;
+  let off = 0, svg = `<circle cx="84" cy="84" r="64" fill="none" stroke="${P.track}" stroke-width="21"/>`;
+  segs.forEach(s=>{
+    const len = total ? C*(s.value/total) : 0;
+    svg += `<circle cx="84" cy="84" r="64" fill="none" stroke="${s.color}" stroke-width="21"
+      stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}"
+      transform="rotate(-90 84 84)"/>`;
+    off += len;
+  });
+  svg += `<text x="84" y="78" text-anchor="middle" style="font-size:8.5px;font-weight:800;letter-spacing:.1em;fill:${P.muted}">SALDO TOTAL</text>
+          <text x="84" y="96" text-anchor="middle" style="font-size:14px;font-weight:800;fill:${P.text}">${short(total)}</text>`;
+  $('#donut').innerHTML = svg;
+
+  $('#donutLegend').innerHTML = segs.length ? segs.map(s=>`
+    <div class="li">
+      <span class="dot" style="background:${s.color}"></span>
+      <span class="nm">${esc(s.name)}</span>
+      <span class="vl">${short(s.value)}</span>
+      <span class="pc">${total?pct(s.value/total):'0%'}</span>
+    </div>`).join('') : '<div class="li"><span class="nm">Sem dados para os filtros selecionados.</span></div>';
+}
+
+/* ------------------------------- hbars ---------------------------------- */
+function renderHBars(el, items, colorFn){
+  const P = palette();
+  const max = Math.max.apply(null, items.map(i=>i.value).concat([1]));
+  if(!items.length){ el.innerHTML = '<div class="skeleton">Sem dados.</div>'; return; }
+  el.innerHTML = items.map((it,i)=>`
+    <div class="hbar">
+      <span class="hl">${esc(it.name)}</span>
+      <span class="hv">${it.compact===false ? brl0(it.value) : short(it.value)}</span>
+      <span class="track"><span class="fill" style="width:${(it.value/max*100).toFixed(1)}%;background:${colorFn?colorFn(it,i):P.blue}"></span></span>
+    </div>`).join('');
+}
+function groupSum(rows, keyFn){
+  const m = {};
+  rows.forEach(r=>{ const k = keyFn(r); m[k] = (m[k]||0) + r[2]; });
+  return Object.keys(m).map(k=>({ name:k, value:m[k] })).sort((a,b)=>b.value-a.value);
+}
+
+/* ---------------------------- gráfico de linha --------------------------- */
+function renderLine(el, hist, proj, refK){
+  const P = palette();
+  const W = 760, H = 240, PL = 62, PR = 14, PT = 16, PB = 30;
+  const all = hist.concat(proj);
+  if(all.length < 2){ el.innerHTML = '<text x="20" y="40" class="axis">Dados insuficientes</text>'; return; }
+  const vals = all.map(p=>p.v);
+  let mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
+  if(mn === mx){ mn = mn*0.9; mx = mx*1.1 || 1; }
+  const pad = (mx-mn)*0.12; mn = Math.max(0, mn-pad); mx = mx+pad;
+  const n = all.length;
+  const X = i => PL + (W-PL-PR) * (n===1?0.5:i/(n-1));
+  const Y = v => PT + (H-PT-PB) * (1 - (v-mn)/(mx-mn));
+
+  let grid = '';
+  for(let g=0; g<=4; g++){
+    const v = mn + (mx-mn)*g/4, y = Y(v);
+    grid += `<line class="gline" x1="${PL}" y1="${y.toFixed(1)}" x2="${W-PR}" y2="${y.toFixed(1)}"/>
+             <text class="axis" x="${PL-8}" y="${(y+3).toFixed(1)}" text-anchor="end">${short(v)}</text>`;
+  }
+  const line = pts => pts.map((p,i)=>`${i?'L':'M'}${X(all.indexOf(p)).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ');
+  const area = hist.map((p,i)=>`${i?'L':'M'}${X(i).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ')
+             + ` L${X(hist.length-1).toFixed(1)},${(H-PB)} L${PL},${(H-PB)} Z`;
+
+  let xl = '';
+  const step = Math.ceil(n/8);
+  all.forEach((p,i)=>{
+    if(i%step && i!==n-1) return;
+    const [y,m] = p.k.split('-');
+    xl += `<text class="axis" x="${X(i).toFixed(1)}" y="${H-10}" text-anchor="middle">${MESES_PT[+m-1]}/${y.slice(2)}</text>`;
+  });
+
+  const ri = hist.length-1;
+  const refMark = ri>=0 ? `<circle cx="${X(ri).toFixed(1)}" cy="${Y(hist[ri].v).toFixed(1)}" r="4.5" fill="${P.blue}" stroke="${P.card}" stroke-width="2.5"/>` : '';
+  const projPath = proj.length ? `<path d="M${X(ri).toFixed(1)},${Y(hist[ri].v).toFixed(1)} ${proj.map((p,i)=>`L${X(ri+1+i).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ')}"
+      fill="none" stroke="${P.slate}" stroke-width="2.4" stroke-dasharray="6 5" stroke-linecap="round"/>` : '';
+
+  el.innerHTML = `<defs><linearGradient id="lgEvo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${P.blue}" stop-opacity=".26"/>
+      <stop offset="100%" stop-color="${P.blue}" stop-opacity="0"/></linearGradient></defs>
+    ${grid}
+    <path d="${area}" fill="url(#lgEvo)"/>
+    <path d="${line(hist)}" fill="none" stroke="${P.blue}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+    ${projPath}${refMark}${xl}`;
+  el.setAttribute('viewBox', `0 0 ${W} ${H}`);
+}
+
+/* ------------------------- barras agrupadas por ano ---------------------- */
+function renderBarAno(el, pgAno, anos){
+  const P = palette();
+  const W = 760, H = 240, PL = 62, PR = 14, PT = 16, PB = 34;
+  if(!anos.length){ el.innerHTML = '<text x="20" y="40" class="axis">Sem pagamentos registrados.</text>'; return; }
+  const max = Math.max.apply(null, anos.map(a=>pgAno[a].total).concat([1]));
+  const bw = (W-PL-PR)/anos.length;
+  const barW = Math.min(64, bw*0.52);
+  const Y = v => PT + (H-PT-PB) * (1 - v/max);
+
+  let grid = '';
+  for(let g=0; g<=4; g++){
+    const v = max*g/4, y = Y(v);
+    grid += `<line class="gline" x1="${PL}" y1="${y.toFixed(1)}" x2="${W-PR}" y2="${y.toFixed(1)}"/>
+             <text class="axis" x="${PL-8}" y="${(y+3).toFixed(1)}" text-anchor="end">${short(v)}</text>`;
+  }
+  let bars = '';
+  anos.forEach((a,i)=>{
+    const d = pgAno[a];
+    const cx = PL + bw*i + bw/2;
+    const x = cx - barW/2;
+    let y = H-PB;
+    [['principal',P.blue],['juros',P.orange],['encargos',P.slate]].forEach(([k,col])=>{
+      const h = (H-PT-PB) * (d[k]/max);
+      y -= h;
+      if(h>0.4) bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" fill="${col}" rx="2"/>`;
+    });
+    bars += `<text class="axis" x="${cx.toFixed(1)}" y="${H-16}" text-anchor="middle" style="font-size:11px">${a}</text>
+             <text x="${cx.toFixed(1)}" y="${(y-8).toFixed(1)}" text-anchor="middle" style="font-size:10.5px;font-weight:800;fill:${P.text}">${short(d.total)}</text>`;
+  });
+  el.innerHTML = grid + bars;
+  el.setAttribute('viewBox', `0 0 ${W} ${H}`);
+}
+
+/* -------------------------------- tabela -------------------------------- */
+function renderTable(V){
+  const rows = V.rows.slice().sort((a,b)=>{
+    const k = ST.sortK;
+    let x = a[k], y = b[k];
+    if(typeof x === 'string'){ x = x.toLowerCase(); y = String(y).toLowerCase(); }
+    if(x<y) return -1*ST.sortDir*-1 === -1 ? 1 : 1; /* placeholder */
+    return 0;
+  });
+  const sorted = V.rows.slice().sort((a,b)=>{
+    const k = ST.sortK; let x = a[k], y = b[k];
+    if(typeof x === 'string'){ x = String(x).toLowerCase(); y = String(y).toLowerCase(); }
+    if(x===y) return 0;
+    return (x<y? -1:1) * ST.sortDir;
+  });
+  const pages = Math.max(1, Math.ceil(sorted.length/ST.pageSize));
+  if(ST.page>pages) ST.page = pages;
+  const start = (ST.page-1)*ST.pageSize;
+  const slice = sorted.slice(start, start+ST.pageSize);
+  const tot = V.total || 1;
+
+  $('#tbodyEstoque').innerHTML = slice.length ? slice.map(r=>`
+    <tr>
+      <td class="strong" title="${esc(r[0])}">${esc(r[0])}</td>
+      <td><span class="tag ${esc(r[1])}">${esc(tipoLabel(r[1]))}</span></td>
+      <td>${esc(r[3])}</td>
+      <td class="num strong">${brl(r[2])}</td>
+      <td class="num">${pct(r[2]/tot)}</td>
+    </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:26px">Nenhum contrato corresponde aos filtros.</td></tr>';
+
+  $('#pgInfo').textContent = sorted.length ? `Página ${ST.page} de ${pages} · ${sorted.length} registros` : '0 registros';
+  $('#pgPrev').disabled = ST.page<=1;
+  $('#pgNext').disabled = ST.page>=pages;
+  $$('#tblEstoque thead th').forEach(th=>{
+    th.classList.toggle('on', +th.dataset.k === ST.sortK);
+    const a = th.querySelector('.arw');
+    if(a) a.textContent = (+th.dataset.k === ST.sortK) ? (ST.sortDir>0?'▲':'▼') : '▲▼';
+  });
+
+  const pr = V.proj.slice().sort((a,b)=>(b[1]+b[3]+b[5])-(a[1]+a[3]+a[5]));
+  $('#tbodyProj').innerHTML = pr.length ? pr.map(p=>`
+    <tr>
+      <td class="strong">${esc(p[0])}</td>
+      <td class="num">${brl0(p[1])}</td>
+      <td class="num">${brl0(p[2])}</td>
+      <td class="num">${brl0(p[3])}</td>
+      <td class="num">${brl0(p[4])}</td>
+      <td class="num strong">${brl0(p[1]+p[3]+p[5])}</td>
+    </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:26px">Sem projeções para os filtros selecionados.</td></tr>';
+}
+
+/* ------------------------- nota de análise ------------------------------ */
+function renderNote(V){
+  const P = palette();
+  const byTipo = { INTERNA:0, EXTERNA:0, REESTRUTURACAO:0, OUTROS:0 };
+  V.rows.forEach(r=>{ byTipo[r[1]] = (byTipo[r[1]]||0) + r[2]; });
+  const cred = groupSum(V.rows, r=>r[3]);
+  const top = cred[0];
+  const topPct = top && V.total ? top.value/V.total : 0;
+  const dom = [['interna',byTipo.INTERNA],['externa',byTipo.EXTERNA],['reestruturada',byTipo.REESTRUTURACAO]]
+    .sort((a,b)=>b[1]-a[1])[0];
+  const [y,m] = (V.refK||'').split('-');
+  const refTxt = m ? MESES_LONGO[+m-1]+'/'+y : '—';
+  const varTxt = V.delta>=0
+    ? `aumento de <b>${pct(Math.abs(V.delta))}</b>` : `redução de <b>${pct(Math.abs(V.delta))}</b>`;
+  const conc = topPct>0.5 ? `alta concentração em <b>${esc(top.name)}</b>` : `distribuição pulverizada entre ${cred.length} credores`;
+  $('#noteText').innerHTML =
+    `Em <b>${refTxt}</b>, o estoque da dívida soma <b>${compact(V.total)}</b>, com ${varTxt} frente ao mês anterior. `+
+    `A carteira é majoritariamente <b>${dom[0]}</b> (${pct(dom[1]/(V.total||1))} do saldo) e apresenta ${conc}`+
+    (top? ` (${pct(topPct)} do total)` : '') + `. `+
+    `No fluxo de pagamentos, o principal responde por <b>${pct(V.pgComp.principal/(V.pgTotal||1))}</b>, `+
+    `os juros por <b>${pct(V.pgComp.juros/(V.pgTotal||1))}</b> e os encargos por <b>${pct(V.pgComp.encargos/(V.pgTotal||1))}</b> do total pago.`;
+}
+
+/* ------------------------------- render --------------------------------- */
+function render(){
+  const V = buildView();
+  window.__V = V;
+  renderKPIs(V);
+  renderDonut(V);
+  const P = palette();
+  renderHBars($('#chCredor'), groupSum(V.rows, r=>r[3]), (it,i)=> i===0?P.blue : (i===1?P.blue : P.slate));
+  const comp = [
+    { name:'Principal', value: V.pgComp.principal },
+    { name:'Juros',     value: V.pgComp.juros },
+    { name:'Encargos',  value: V.pgComp.encargos }
+  ].sort((a,b)=>b.value-a.value);
+  const compColors = { Principal:P.blue, Juros:P.orange, Encargos:P.slate };
+  renderHBars($('#chComponente'), comp, it=>compColors[it.name]||P.blue);
+  const tipos = [['Interna',byTipoOf(V,'INTERNA')],['Externa',byTipoOf(V,'EXTERNA')],['Reestruturação',byTipoOf(V,'REESTRUTURACAO')]]
+    .filter(t=>t[1]>0).sort((a,b)=>b[1]-a[1]);
+  const tColors = { 'Interna':P.blue, 'Externa':P.orange, 'Reestruturação':P.slate };
+  renderHBars($('#chTipo'), tipos.map(t=>({name:t[0],value:t[1]})), it=>tColors[it.name]||P.blue);
+  renderLine($('#lineEvo'), V.serieHist, V.projSerie, V.refK);
+  renderBarAno($('#barAno'), V.pgAno, V.anos);
+  renderTable(V);
+  renderNote(V);
+
+  const ev = V.serieHist.length>1 ? (V.serieHist[V.serieHist.length-1].v - V.serieHist[0].v)/V.serieHist[0].v : 0;
+  const pill = $('#evoPill');
+  pill.className = 'pill ' + (ev>=0?'up':'down');
+  pill.textContent = (ev>=0?'+':'') + pct(ev) + ' no período';
+}
+function byTipoOf(V,k){ return V.rows.filter(r=>r[1]===k).reduce((s,r)=>s+r[2],0); }
+
+/* --------------------------- filtros / controles ------------------------- */
+function fillFilters(){
+  const ms = monthsOf(RAW);
+  const anos = Array.from(new Set(ms.map(k=>k.slice(0,4)))).sort();
+  const refK = referenceMonth(RAW);
+  const selA = $('#fAno'), selM = $('#fMes');
+  selA.innerHTML = '<option value="">Automático</option>' + anos.map(a=>`<option value="${a}">${a}</option>`).join('');
+  const refAno = refK ? refK.slice(0,4) : (anos[anos.length-1]||'');
+  const refMesN = refK ? refK.slice(5,7) : '12';
+  ST.ano = refAno; ST.mes = refMesN;
+  selA.value = refAno;
+  const mesesDoAno = ms.filter(k=>k.startsWith(refAno+'-')).map(k=>k.slice(5,7));
+  selM.innerHTML = mesesDoAno.map(mm=>`<option value="${mm}">${MESES_LONGO[+mm-1]} / ${refAno}</option>`).join('');
+  selM.value = refMesN;
+
+  const creds = Array.from(new Set(Object.values(RAW.estoque).flat().map(r=>credorOf(r[0])))).sort();
+  const selC = $('#fCredor');
+  selC.innerHTML = '<option value="">Todos</option>' + creds.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+}
+function syncMonthOptions(){
+  const ms = monthsOf(RAW);
+  const selM = $('#fMes');
+  const ano = $('#fAno').value;
+  const lista = ms.filter(k=>k.startsWith(ano+'-')).map(k=>k.slice(5,7));
+  const keep = selM.value;
+  selM.innerHTML = lista.map(mm=>`<option value="${mm}">${MESES_LONGO[+mm-1]} / ${ano}</option>`).join('');
+  selM.value = lista.indexOf(keep)>-1 ? keep : (lista[lista.length-1]||'');
+}
+function updateMeta(V){
+  const [y,m] = (V.refK||'').split('-');
+  const comp = m ? (MESES_LONGO[+m-1]+'/'+y) : '—';
+  $('#fMeta').innerHTML = `Competência <b>${comp}</b><br>${V.rows.length} de ${V.rowsRef.length} contratos · <b>${compact(V.total)}</b>`;
+}
+
+/* ------------------------------ exportação ------------------------------ */
+function exportCSV(){
+  const V = window.__V; if(!V) return;
+  const lines = [['Contrato','Tipo','Credor','Saldo (R$)','% do total'].join(';')];
+  V.rows.slice().sort((a,b)=>b[2]-a[2]).forEach(r=>{
+    lines.push([`"${String(r[0]).replace(/"/g,'""')}"`, tipoLabel(r[1]), `"${r[3]}"`,
+      nf2.format(r[2]).replace(/\./g,'').replace(',','.'), pct(r[2]/(V.total||1)).replace(',','.')].join(';'));
+  });
+  lines.push(['TOTAL','','', nf2.format(V.total).replace(/\./g,'').replace(',','.'),'100'].join(';'));
+  const blob = new Blob(['\ufeff'+lines.join('\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `divida-seplan-${V.refK||'base'}.csv`;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('CSV exportado com '+V.rows.length+' registros.', 'ok');
+}
+
+/* -------------------------------- toasts -------------------------------- */
+function toast(msg, kind){
+  const wrap = $('#toasts');
+  const el = document.createElement('div');
+  el.className = 'toast ' + (kind||'');
+  const ic = kind==='err'
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  el.innerHTML = ic + '<span>' + esc(msg) + '</span>';
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.transition='.3s'; el.style.opacity='0'; el.style.transform='translateY(8px)'; setTimeout(()=>el.remove(),320); }, kind==='err'?6000:3800);
+}
+
+/* ------------------------- carregamento do SheetJS ----------------------- */
+let xlsxPromise = null;
+function ensureXLSX(){
+  if(window.XLSX) return Promise.resolve(window.XLSX);
+  if(xlsxPromise) return xlsxPromise;
+  const urls = [
+    'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
+    'https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js',
+    'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'
+  ];
+  xlsxPromise = new Promise((res,rej)=>{
+    let i = 0;
+    const next = ()=>{
+      if(i>=urls.length) return rej(new Error('Não foi possível carregar a biblioteca de leitura de Excel (verifique sua conexão).'));
+      const s = document.createElement('script');
+      s.src = urls[i++];
+      s.onload = ()=> window.XLSX ? res(window.XLSX) : next();
+      s.onerror = next;
+      document.head.appendChild(s);
+    };
+    next();
+  });
+  return xlsxPromise;
+}
+
+/* ------------------------- parsing da planilha -------------------------- */
+function sheetByName(wb, ...names){
+  const want = names.map(n=>n.toUpperCase().replace(/[^A-Z0-9]/g,''));
+  for(const key of Object.keys(wb.Sheets)){
+    const norm = key.toUpperCase().replace(/[^A-Z0-9]/g,'');
+    if(want.some(w=>norm===w || norm.indexOf(w)>-1)) return wb.Sheets[key];
+  }
+  return null;
+}
+function rowsOf(ws, XLSX){
+  return XLSX.utils.sheet_to_json(ws, {header:1, raw:true, defval:null, blankrows:false});
+}
+function findHeader(rows, must){
+  for(let i=0;i<Math.min(rows.length,40);i++){
+    const line = rows[i].map(c=>String(c==null?'':c).toUpperCase());
+    if(must.every(m=>line.some(c=>c.indexOf(m)>-1))) return i;
+  }
+  return -1;
+}
+function excelDate(v){
+  if(v instanceof Date && !isNaN(v)) return v;
+  if(typeof v === 'number' && v>20000 && v<80000) return new Date(Date.UTC(1899,11,30) + v*86400000);
+  const s = String(v||'').trim();
+  let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m) return new Date(Date.UTC(+m[1], +m[2]-1, +m[3]));
+  m = s.match(/^(\d{2})[\/\-.](\d{2})[\/\-.](\d{4})/);
+  if(m) return new Date(Date.UTC(+m[3], +m[2]-1, +m[1]));
+  return null;
+}
+function parseWorkbook(wb, XLSX){
+  const log = [];
+  const out = { estoque:{}, pagamentos:[], saldo2025:{meses:[],rows:[]}, proj:[] };
+
+  /* --- BASE ESTQ --- */
+  const wsE = sheetByName(wb,'BASE ESTQ','BASE ESTOQUE','ESTOQUE');
+  if(!wsE) throw new Error('Aba "BASE ESTQ" não encontrada na planilha.');
+  const rE = rowsOf(wsE, XLSX);
+  const hE = findHeader(rE, ['CONTRATO','SALDO']);
+  if(hE<0) throw new Error('Cabeçalho da aba "BASE ESTQ" não localizado (esperado: CONTRATO, TIPO, SALDO, DATA).');
+  const mapE = {}; rE[hE].forEach((c,i)=>{ mapE[String(c||'').trim().toUpperCase()] = i; });
+  const iC = mapE['CONTRATO'], iT = mapE['TIPO'], iS = mapE['SALDO'], iD = mapE['DATA'];
+  for(let i=hE+1;i<rE.length;i++){
+    const r = rE[i]; if(!r || r[iC]==null) continue;
+    const d = excelDate(r[iD]);
+    if(!d) continue;
+    const key = d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0');
+    (out.estoque[key] = out.estoque[key] || []).push([String(r[iC]).trim(), String(r[iT]||'').trim(), toNum(r[iS])]);
+  }
+  log.push(['ok','BASE ESTQ: '+Object.keys(out.estoque).length+' competências, '+Object.values(out.estoque).reduce((s,a)=>s+a.length,0)+' registros']);
+
+  /* --- BASE PGTO --- */
+  const wsP = sheetByName(wb,'BASE PGTO','BASE PAGAMENTO','PAGAMENTO');
+  if(wsP){
+    const rP = rowsOf(wsP, XLSX);
+    const hP = findHeader(rP, ['CONTRATO','PRINCIPAL']);
+    if(hP>=0){
+      const mP = {}; rP[hP].forEach((c,i)=>{ const k=String(c||'').trim().toUpperCase(); if(!(k in mP)) mP[k]=i; });
+      const cC=mP['CONTRATO'], cM=mP['MÊS']!==undefined?mP['MÊS']:mP['MES'], cA=mP['ANO'],
+            cT=mP['TIPO'], cP=mP['PRINCIPAL'], cJ=mP['JUROS'], cE=mP['ENCARGOS'], cTot=mP['TOTAL'];
+      for(let i=hP+1;i<rP.length;i++){
+        const r = rP[i]; if(!r || r[cC]==null) continue;
+        const total = toNum(r[cTot]);
+        if(!total && !toNum(r[cP]) && !toNum(r[cJ]) && !toNum(r[cE])) continue;
+        out.pagamentos.push([String(r[cC]).trim(), String(r[cM]||'').trim(), Math.round(toNum(r[cA]))||0,
+          String(r[cT]||'').trim(), toNum(r[cP]), toNum(r[cJ]), toNum(r[cE]), total]);
+      }
+    }
+    log.push(['ok','BASE PGTO: '+out.pagamentos.length+' lançamentos de pagamento']);
+  } else log.push(['err','Aba "BASE PGTO" não encontrada — gráficos de pagamento ficarão vazios.']);
+
+  /* --- SALDO DEVEDOR --- */
+  const wsS = sheetByName(wb,'SALDO DEVEDOR','SALDODEVEDOR');
+  if(wsS){
+    const rS = rowsOf(wsS, XLSX);
+    const hS = findHeader(rS, ['CONTRATO']);
+    if(hS>=0){
+      const hdr = rS[hS];
+      const blocks = [];
+      hdr.forEach((c,i)=>{ if(String(c||'').trim().toUpperCase()==='CONTRATO') blocks.push(i); });
+      const meses = ['01','02','03','04','05','06','07','08','09','10','11','12'].map(m=>'2025-'+m);
+      const add = (name, vals)=>{
+        const clean = vals.map(v=>toNum(v));
+        if(!name || !clean.some(v=>v)) return;
+        if(out.saldo2025.rows.some(r=>r[0]===name)) return;
+        out.saldo2025.rows.push([name, clean]);
+      };
+      for(let i=hS+1;i<rS.length;i++){
+        const r = rS[i]; if(!r) continue;
+        blocks.forEach(b=>{ if(r[b]!=null) add(String(r[b]).trim(), [r[b+1],r[b+2],r[b+3],r[b+4],r[b+5],r[b+6]]); });
+      }
+      out.saldo2025.meses = meses;
+    }
+    log.push(['ok','SALDO DEVEDOR: '+out.saldo2025.rows.length+' contratos com série mensal']);
+  } else log.push(['err','Aba "SALDO DEVEDOR 2025" não encontrada.']);
+
+  /* --- PROJ DIVIDA --- */
+  const wsD = sheetByName(wb,'PROJ DIVIDA','PROJDIVIDA','PROJEÇÃO');
+  if(wsD){
+    const rD = rowsOf(wsD, XLSX);
+    const hD = findHeader(rD, ['CONTRATO','ACUMULADO']);
+    if(hD>=0){
+      const mD = {}; rD[hD].forEach((c,i)=>{ const k=String(c||'').trim().toUpperCase(); if(k) mD[k]=i; });
+      const cC = mD['CONTRATO'];
+      const idxAcum = [], idxMed = [];
+      rD[hD].forEach((c,i)=>{
+        const k = String(c||'').trim().toUpperCase();
+        if(k==='ACUMULADO') idxAcum.push(i);
+        if(k==='MÉDIA'||k==='MEDIA') idxMed.push(i);
+      });
+      for(let i=hD+1;i<rD.length;i++){
+        const r = rD[i]; if(!r || r[cC]==null) continue;
+        const g = (arr)=> arr.length? toNum(r[arr[0]]) : 0;
+        const gm = (arr)=> arr.length? toNum(r[arr[0]]) : 0;
+        const row = [String(r[cC]).trim(),
+          g(idxAcum.slice(0,1)), gm(idxMed.slice(0,1)),
+          g(idxAcum.slice(1,2)), gm(idxMed.slice(1,2)),
+          g(idxAcum.slice(2,3)), gm(idxMed.slice(2,3))];
+        if(row.slice(1).some(v=>v)) out.proj.push(row);
+      }
+    }
+    log.push(['ok','PROJ DIVIDA: '+out.proj.length+' contratos projetados']);
+  } else log.push(['err','Aba "PROJ DIVIDA" não encontrada.']);
+
+  if(!Object.keys(out.estoque).length) throw new Error('Nenhum registro válido foi encontrado na aba "BASE ESTQ".');
+  return { data: out, log };
+}
+
+/* ---------------------------- fluxo de upload --------------------------- */
+function setBusy(on, txt){
+  const dz = $('#dropzone'), dz2 = $('#dropzone2');
+  [dz,dz2].forEach(d=>{ if(!d) return; d.style.pointerEvents = on?'none':''; d.style.opacity = on?'.6':''; });
+  if(on && dz) dz.querySelector('small') && (dz.querySelector('small').textContent = txt||'Processando…');
+}
+function logLines(lines){
+  const el = $('#mLog');
+  el.classList.remove('hidden');
+  el.innerHTML = lines.map(([k,t])=>`<div class="${k==='ok'?'ok':'err'}">${k==='ok'?'✓':'✕'} ${esc(t)}</div>`).join('');
+}
+async function handleFile(file){
+  if(!file) return;
+  if(!/\.(xlsx|xlsm|xls)$/i.test(file.name)){ toast('Formato inválido. Envie um arquivo .xlsx.', 'err'); return; }
+  $('#overlay').classList.add('show');
+  $('#mTitle').textContent = 'Processando planilha…';
+  $('#mDesc').textContent = file.name + ' · ' + (file.size/1024).toFixed(0) + ' KB';
+  setBusy(true, 'Lendo arquivo…');
+  try{
+    const XLSX = await ensureXLSX();
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(new Uint8Array(buf), {type:'array', cellDates:true});
+    const { data, log } = parseWorkbook(wb, XLSX);
+    RAW = normalize(data);
+    RAW_FROM_STORAGE = true;
+    try{ localStorage.setItem(LS_DATA, JSON.stringify({data:RAW, at:Date.now(), file:file.name})); }catch(e){}
+    fillFilters();
+    render();
+    logLines(log.concat([['ok','Base atualizada e painel recalculado']]));
+    $('#mTitle').textContent = 'Base atualizada com sucesso';
+    $('#mDesc').textContent = 'Fonte: ' + file.name;
+    setBusy(false);
+    stamp('Atualizado de ' + file.name);
+    $('#srcBadge').textContent = 'Base própria';
+    toast('Base atualizada: ' + Object.keys(RAW.estoque).length + ' competências carregadas.', 'ok');
+  }catch(err){
+    logLines([['err', String(err && err.message || err)]]);
+    $('#mTitle').textContent = 'Não foi possível ler a planilha';
+    $('#mDesc').textContent = 'A base anterior foi mantida.';
+    setBusy(false);
+    toast('Falha ao ler a planilha: ' + (err && err.message || err), 'err');
+  }
+}
+function stamp(txt){
+  const d = new Date();
+  $('#footStamp').textContent = (txt?txt+' · ':'') + d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+}
+function loadStored(){
+  try{
+    const s = JSON.parse(localStorage.getItem(LS_DATA)||'null');
+    if(s && s.data && s.data.estoque && Object.keys(s.data.estoque).length){
+      RAW_FROM_STORAGE = true;
+      setTimeout(()=>stamp('Base salva localmente'),0);
+      return s;
+    }
+  }catch(e){}
+  return null;
+}
+
+/* ------------------------------- eventos -------------------------------- */
+function bind(){
+  $('#fAno').addEventListener('change', ()=>{ ST.ano = $('#fAno').value; syncMonthOptions(); ST.mes = $('#fMes').value; ST.page=1; render(); updateMeta(window.__V); });
+  $('#fMes').addEventListener('change', ()=>{ ST.mes = $('#fMes').value; ST.page=1; render(); updateMeta(window.__V); });
+  $('#fTipo').addEventListener('change', ()=>{ ST.tipo = $('#fTipo').value; ST.page=1; render(); });
+  $('#fCredor').addEventListener('change', ()=>{ ST.credor = $('#fCredor').value; ST.page=1; render(); });
+  $('#fBusca').addEventListener('input', debounce(()=>{ ST.busca = $('#fBusca').value; ST.page=1; render(); }, 200));
+
+  $$('#tblEstoque thead th.sortable').forEach(th=>{
+    th.addEventListener('click', ()=>{
+      const k = +th.dataset.k;
+      if(ST.sortK===k) ST.sortDir *= -1; else { ST.sortK = k; ST.sortDir = (k===0||k===1||k===2)?1:-1; }
+      render();
+    });
+  });
+  $('#pgPrev').addEventListener('click', ()=>{ if(ST.page>1){ ST.page--; render(); } });
+  $('#pgNext').addEventListener('click', ()=>{ ST.page++; render(); });
+
+  const openModal = ()=>{ $('#overlay').classList.add('show'); $('#mTitle').textContent='Atualizar base de dados';
+    $('#mDesc').textContent='Selecione a planilha Excel (.xlsx) do relatório de estoque e pagamento da dívida.';
+    $('#mLog').classList.add('hidden'); $('#mLog').innerHTML=''; };
+  $('#btnUpload').addEventListener('click', openModal);
+  $('#mClose').addEventListener('click', ()=> $('#overlay').classList.remove('show'));
+  $('#overlay').addEventListener('click', e=>{ if(e.target === $('#overlay')) $('#overlay').classList.remove('show'); });
+  $('#mPick').addEventListener('click', ()=> $('#fileInput2').click());
+  $('#dropzone').addEventListener('click', ()=> $('#fileInput').click());
+  $('#dropzone2').addEventListener('click', ()=> $('#fileInput2').click());
+  $('#fileInput').addEventListener('change', e=>{ handleFile(e.target.files[0]); e.target.value=''; });
+  $('#fileInput2').addEventListener('change', e=>{ handleFile(e.target.files[0]); e.target.value=''; });
+
+  ['#dropzone','#dropzone2'].forEach(sel=>{
+    const el = $(sel);
+    ['dragenter','dragover'].forEach(ev=> el.addEventListener(ev, e=>{ e.preventDefault(); el.classList.add('over'); }));
+    ['dragleave','drop'].forEach(ev=> el.addEventListener(ev, e=>{ e.preventDefault(); el.classList.remove('over'); }));
+    el.addEventListener('drop', e=>{ const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if(f) handleFile(f); });
+  });
+  document.addEventListener('dragover', e=>e.preventDefault());
+  document.addEventListener('drop', e=>{
+    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if(f && /\.(xlsx|xlsm|xls)$/i.test(f.name)){ e.preventDefault(); handleFile(f); }
+  });
+
+  $('#btnExport').addEventListener('click', exportCSV);
+  $('#btnPrint').addEventListener('click', ()=> window.print());
+  $('#btnRestore').addEventListener('click', ()=>{
+    RAW = SEED; RAW_FROM_STORAGE = false;
+    try{ localStorage.removeItem(LS_DATA); }catch(e){}
+    fillFilters(); render(); updateMeta(window.__V);
+    $('#srcBadge').textContent = 'Base 2026';
+    stamp('Base original restaurada');
+    toast('Base original do relatório restaurada.', 'ok');
+  });
+
+  const btnT = $('#btnTheme');
+  const applyTheme = t=>{ document.documentElement.setAttribute('data-theme', t); try{ localStorage.setItem(LS_THEME,t); }catch(e){} render(); };
+  btnT.addEventListener('click', ()=> applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+  let saved = 'light'; try{ saved = localStorage.getItem(LS_THEME) || 'light'; }catch(e){}
+  document.documentElement.setAttribute('data-theme', saved);
+
+  window.addEventListener('resize', debounce(()=>render(), 260));
+  window.addEventListener('keydown', e=>{
+    if(e.key==='Escape') $('#overlay').classList.remove('show');
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='o'){ e.preventDefault(); $('#fileInput').click(); }
+  });
+}
+
+/* ------------------------------- inicialização -------------------------- */
+(function init(){
+  const stored = loadStored();
+  RAW = stored ? normalize(stored.data) : normalize(SEED);
+  fillFilters();
+  bind();
+  render();
+  updateMeta(window.__V);
+  if(RAW_FROM_STORAGE){
+    $('#srcBadge').textContent = 'Base própria';
+    stamp('Base salva localmente');
+  } else {
+    stamp('Base original do relatório');
+  }
+  window.addEventListener('load', ()=> setTimeout(render, 60));
+})();
+
+})();
+
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
