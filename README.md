@@ -2,7 +2,7 @@
 
 Dashboard web (100% client-side) para análise do **estoque da dívida pública** e do **fluxo de pagamentos**, com **atualização por planilha Excel** direto no navegador.
 
-> Analista & Gestor de Dívida Pública — **Jokson Muniz** · SEPLAN MA
+> Elaboração técnica: Analista & Supervisor de Contratos | Dívida Pública | SEPLAN - MA
 
 ---
 
@@ -14,6 +14,7 @@ Dashboard web (100% client-side) para análise do **estoque da dívida pública*
 | **KPIs automáticos** | Saldo total devedor, dívida interna, externa, reestruturação, pagamentos acumulados e nº de contratos — com variação vs. mês anterior. |
 | **Gráficos** | Rosca (composição por tipo), barras horizontais (credor, componente de pagamento, concentração) e séries temporais (evolução do saldo + projeção, pagamentos por ano). |
 | **Filtros** | Ano, mês de competência, tipo de dívida, credor e busca livre — tudo recalcula na hora. |
+| **Análise por período (todos os anos)** | Matriz **período × ano** com granularidade flexível — **mês, bimestre, trimestre, quadrimestre, semestre ou ano** — em dois modos: *saldo no fim do período* e *variação no período*. Inclui gráfico de barras agrupadas por ano e exportação CSV. |
 | **Comparativo entre competências** | Quatro meses lado a lado: cards de resumo por competência (saldo, composição e variação), tabela contrato × competência com variação absoluta, Δ % e sparkline de tendência, e exportação do comparativo em CSV. |
 | **Tabelas** | Contratos ordenáveis, paginados e com total; tabela de projeção por contrato. |
 | **Exportação** | CSV dos dados filtrados e impressão / PDF do painel. |
@@ -54,6 +55,39 @@ Depois ative o GitHub Pages em **Settings → Pages** (branch `main`, pasta `/ (
 
 ---
 
+## 📊 Análise comparativa por período — todos os anos
+
+Seção que reproduz a lógica do **RGF – Anexo 2 (LRF, art. 55, I, "b")**: os períodos seguem o **fechamento acumulado** — 1º quadrimestre (jan–abr), 2º (mai–ago) e 3º (set–dez).
+
+### Granularidade flexível
+
+Basta clicar para alternar entre **Mês · Bimestre · Trimestre · Quadrimestre · Semestre · Ano**. A matriz e o gráfico se recalculam na hora, sempre respeitando os filtros do painel.
+
+| Granularidade | Períodos |
+|---|---|
+| Mês | JAN … DEZ (12) |
+| Bimestre | 1º Bim … 6º Bim (6) |
+| Trimestre | 1º Tri … 4º Tri (4) |
+| **Quadrimestre** | 1º Quad (jan–abr) · 2º Quad (mai–ago) · 3º Quad (set–dez) |
+| Semestre | 1º Sem · 2º Sem |
+| Ano | Ano (fechamento em dezembro) |
+
+### Dois modos de leitura
+
+- **Saldo no fim do período** — o estoque no encerramento de cada período. É o equivalente à coluna *"Até o Xº Quadrimestre"* do RGF. A célula de maior saldo de cada linha fica destacada.
+- **Variação no período** — a diferença frente ao fechamento do período anterior, em R$ e em %. Valores em vermelho indicam aumento do saldo; em verde, redução.
+
+### Estrutura da seção
+
+- **Matriz período × ano** — uma coluna por ano (2024, 2025, 2026), mais as colunas **Δ ano→ano** e **Δ %**, e a linha *TOTAL / FECHAMENTO*.
+- **Gráfico de barras agrupadas** — cada período no eixo X com uma barra por ano; barras para baixo indicam redução (no modo variação).
+- **Rodapé de resumo** — granularidade ativa, anos comparados, maior e menor valor, e o último fechamento.
+- **Exportação CSV** — botão *CSV* no cabeçalho da seção.
+
+> **Períodos incompletos** aparecem com um asterisco `*` (células esmaecidas). Como a base de 2026 vai até setembro, o 3º quadrimestre de 2026 reflete apenas o mês disponível.
+
+---
+
 ## 🔀 Comparativo entre competências
 
 A seção **Comparativo entre competências** permite colocar **quatro meses lado a lado** (por padrão, os quatro últimos meses completos da base).
@@ -84,6 +118,7 @@ O painel localiza as abas e os cabeçalhos **automaticamente** (tolerante a vari
 - A **competência de referência** é o último mês cujo saldo representa ≥ 50 % do maior saldo da série — isso ignora automaticamente meses parciais/incompletos.
 - O **credor** é derivado do nome do contrato (BNDES, Caixa Econômica, BID, Banco do Brasil, Lei 9.496/PROPAG).
 - Datas aceitas: formato de data do Excel ou texto `AAAA-MM-DD` / `DD/MM/AAAA`.
+- **Meses parciais** (saldo abaixo de 50 % do maior saldo da série) são sinalizados com `⚠` nos seletores de mês e `*` na matriz por período, e ficam **fora do cálculo do selo de variação** do gráfico de evolução — evitando quedas artificiais.
 
 ---
 

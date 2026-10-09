@@ -331,18 +331,75 @@ footer.foot{
   display:flex;align-items:center;gap:16px;flex-wrap:wrap;
   border-top:1px solid var(--border);margin-top:34px;
 }
-.plate{
-  background:linear-gradient(145deg,#1B2C4B,#0C1830 55%,#1F3358);
-  border:1px solid #2C4268;border-radius:12px;padding:12px 20px;color:#fff;
-  box-shadow:0 14px 30px -14px rgba(11,24,48,.75), inset 0 1px 0 rgba(255,255,255,.13);
-  position:relative;overflow:hidden;
-}
-.plate::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.14) 46%,transparent 60%)}
-.plate .pn{font-size:16px;font-weight:800;letter-spacing:.055em;background:linear-gradient(180deg,#F2F7FF,#9DB8DE);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.plate .pr{font-size:9.5px;font-weight:800;letter-spacing:.11em;color:#8FAEDC;text-transform:uppercase;margin-top:3px}
+.inst{display:flex;flex-direction:column;gap:3px;padding:2px 0 2px 14px;border-left:3px solid var(--blue)}
+.inst .in-n{font-size:14.5px;font-weight:800;letter-spacing:.03em}
+.inst .in-r{font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.055em;text-transform:uppercase;line-height:1.4}
 .foot .src{font-size:11px;color:var(--muted);font-weight:600;line-height:1.6}
 .foot .src b{color:var(--text)}
 
+/* ============================================================
+   COMPARATIVO ENTRE COMPETÊNCIAS
+   ============================================================ */
+.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:1100px){.cols-4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.cols-4{grid-template-columns:1fr}}
+.cmp-selects{display:flex;gap:9px;flex-wrap:wrap;align-items:flex-end}
+.cmp-selects .fl{display:flex;flex-direction:column;gap:3px}
+.cmp-selects label{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.cmp-selects select{min-width:118px}
+.cmp-grid{display:grid;gap:12px;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:4px}
+@media(max-width:1100px){.cmp-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.cmp-grid{grid-template-columns:1fr}}
+.cmp-card{
+  border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card-2);
+  padding:13px 14px;display:flex;flex-direction:column;gap:9px;position:relative;transition:.18s;
+}
+.cmp-card:hover{border-color:var(--blue)}
+.cmp-card .cc-h{display:flex;align-items:center;gap:7px}
+.cmp-card .cc-m{font-size:12.5px;font-weight:800;letter-spacing:.02em}
+.cmp-card .cc-i{margin-left:auto;font-size:9.5px;font-weight:800;color:var(--muted);background:var(--card);
+  border:1px solid var(--border);border-radius:99px;padding:1px 7px}
+.cmp-card .cc-v{font-size:19px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.cmp-card .cc-b{display:flex;flex-direction:column;gap:6px;font-size:10.5px;font-weight:700;color:var(--muted)}
+.cmp-card .cc-r{display:flex;align-items:center;gap:6px}
+.cmp-card .cc-r i{width:7px;height:7px;border-radius:2px;flex:0 0 auto}
+.cmp-card .cc-r span.v{margin-left:auto;color:var(--text);font-variant-numeric:tabular-nums}
+.stack{display:flex;height:7px;border-radius:99px;overflow:hidden;background:var(--track)}
+.stack i{height:100%;display:block}
+.cmp-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;
+  border-top:1px dashed var(--border);padding-top:13px}
+.cmp-foot .cf-l{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.cmp-foot .cf-v{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+td.d-up{color:var(--red);font-weight:800}
+td.d-down{color:var(--green);font-weight:800}
+td.d-flat{color:var(--muted);font-weight:700}
+td.mcol{font-variant-numeric:tabular-nums;white-space:nowrap}
+td.mcol.dim{color:var(--muted);font-weight:600}
+td.mcol.hl{font-weight:800}
+.cmp-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.cmp-sp{width:92px}
+/* ============================================================
+   SEGMENTED + MATRIZ POR PERÍODO
+   ============================================================ */
+.seg{display:inline-flex;background:var(--card-2);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;color:var(--muted);font-size:11.5px;font-weight:700;padding:5px 10px;border-radius:7px;cursor:pointer;white-space:nowrap;transition:.14s}
+.seg button.on{background:var(--card);color:var(--blue);box-shadow:var(--shadow)}
+.seg button:not(.on):hover{color:var(--blue)}
+#tblPer th.pnum,#tblPer td.pnum{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+#tblPer td.pcell{position:relative;min-width:104px}
+#tblPer td.pcell .pv{font-weight:800}
+#tblPer td.pcell .pd{display:block;font-size:9.6px;font-weight:700;color:var(--muted);margin-top:1px}
+#tblPer td.pcell.best{background:color-mix(in srgb,var(--blue) 8%,transparent)}
+#tblPer td.pcell.best .pv{color:var(--blue)}
+#tblPer td.pcell.part{opacity:.62}
+#tblPer td.pcell.part .pv::after{content:"*";color:var(--orange);font-weight:800}
+#tblPer td.pcol{font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+#tblPer tbody tr:hover td.pcell.best{background:color-mix(in srgb,var(--blue) 13%,transparent)}
+.partial-note{font-size:10.5px;color:var(--orange);font-weight:700;margin-top:8px}
+#tblPer td .dcell{font-size:9.6px;font-weight:800;display:block}
+/* gráfico comparativo: mesma proporção dos demais gráficos do painel */
+#chartPer{max-width:760px;margin:16px auto 0}
+.hl-blue{background:color-mix(in srgb,var(--blue) 10%,transparent);font-weight:800;color:var(--blue)}
 .hidden{display:none!important}
 .badge-live{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;letter-spacing:.05em;color:var(--green);text-transform:uppercase}
 .badge-live i{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 22%,transparent);animation:pulse 2s infinite}
@@ -457,12 +514,70 @@ footer.foot{
     <div class="card">
       <div class="card-head"><h3>Evolução do saldo devedor</h3><span class="spacer"></span><span class="pill blue" id="evoPill">—</span></div>
       <svg id="lineEvo" class="spark" viewBox="0 0 760 240" role="img" aria-label="Evolução mensal do saldo devedor"></svg>
-      <div class="legend-inline"><span><i style="background:var(--blue)"></i>Saldo total devedor</span><span><i style="background:var(--slate)"></i>Projeção</span></div>
+      <div class="legend-inline"><span><i style="background:var(--blue)"></i>Saldo total devedor</span><span><i style="background:var(--orange)"></i>Período parcial (incompleto)</span><span><i style="background:var(--slate)"></i>Projeção</span></div>
     </div>
     <div class="card">
       <div class="card-head"><h3>Pagamentos por ano (R$)</h3></div>
       <svg id="barAno" class="spark" viewBox="0 0 760 240" role="img" aria-label="Pagamentos por ano"></svg>
       <div class="legend-inline"><span><i style="background:var(--blue)"></i>Principal</span><span><i style="background:var(--orange)"></i>Juros</span><span><i style="background:var(--slate)"></i>Encargos</span></div>
+    </div>
+  </section>
+
+  <section class="card" style="margin-bottom:var(--grid-gap)">
+    <div class="card-head" style="flex-wrap:wrap;gap:12px">
+      <h3>Análise comparativa por período — todos os anos</h3>
+      <span class="spacer"></span>
+      <div class="seg" id="granSeg"></div>
+      <div class="seg" id="modoSeg"></div>
+      <button class="btn ghost" id="btnPerCsv" title="Exportar a matriz em CSV">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        CSV
+      </button>
+    </div>
+    <div class="tbl-scroll" style="max-height:430px">
+      <table id="tblPer">
+        <thead><tr id="perHead"></tr></thead>
+        <tbody id="tbodyPer"></tbody>
+        <tfoot><tr id="perFootRow"></tr></tfoot>
+      </table>
+    </div>
+    <div class="partial-note hidden" id="perPartial"></div>
+    <svg id="chartPer" class="spark" viewBox="0 0 760 240" role="img" aria-label="Comparativo por período e ano"></svg>
+    <div class="legend-inline" id="perLegend"></div>
+    <div class="cmp-foot" id="perFoot"></div>
+    <div class="note" style="margin-top:14px">
+      <div class="nt">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 15 9l7 .5-5.5 4.5 2 7-6.5-4-6.5 4 2-7L2 9.5 9 9z"/></svg>
+        Metodologia dos períodos
+      </div>
+      Os períodos seguem o <b>fechamento acumulado</b> usado no RGF – Anexo 2 (LRF, art. 55, I, &ldquo;b&rdquo;): <b>1º quadrimestre</b> (jan–abr), <b>2º</b> (mai–ago) e <b>3º</b> (set–dez). Em <b>Saldo no fim do período</b>, cada célula traz o estoque no encerramento do período; em <b>Variação no período</b>, traz a diferença frente ao fechamento do período anterior. Células com <b>*</b> referem-se a períodos ainda incompletos na base.
+    </div>
+  </section>
+
+  <section class="card" style="margin-bottom:var(--grid-gap)">
+    <div class="card-head" style="flex-wrap:wrap;gap:12px">
+      <h3>Comparativo entre competências</h3>
+      <span class="spacer"></span>
+      <div class="cmp-selects" id="cmpSelects"></div>
+      <button class="btn ghost" id="btnCmpCsv" title="Exportar o comparativo em CSV">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        CSV
+      </button>
+    </div>
+    <div class="cmp-grid" id="cmpCards"></div>
+    <div class="cmp-foot" id="cmpFoot"></div>
+    <div class="tbl-scroll" style="max-height:400px;margin-top:14px">
+      <table id="tblCmp">
+        <thead><tr id="cmpHead"></tr></thead>
+        <tbody id="tbodyCmp"></tbody>
+        <tfoot><tr id="cmpFootRow"></tr></tfoot>
+      </table>
+    </div>
+    <div class="legend-inline" style="margin-top:10px">
+      <span><i style="background:var(--blue)"></i>Interna</span>
+      <span><i style="background:var(--orange)"></i>Externa</span>
+      <span><i style="background:var(--slate)"></i>Reestruturação</span>
+      <span style="color:var(--muted)">· Variação em vermelho = aumento do saldo · verde = redução</span>
     </div>
   </section>
 
@@ -505,12 +620,13 @@ footer.foot{
 </main>
 
 <footer class="foot">
-  <div class="plate">
-    <div class="pn">JOKSON MUNIZ</div>
-    <div class="pr">Analista &amp; Gestor de Dívida Pública | SEPLAN MA</div>
+  <div class="inst">
+    <div class="in-n">SEPLAN - MA</div>
+    <div class="in-r">Dívida Pública</div>
   </div>
   <div class="src">
     Fonte: <b>RELATÓRIO ESTOQUE / PAGAMENTO DE DÍVIDA</b> — abas BASE ESTQ, BASE PGTO, PROJ DIVIDA e SALDO DEVEDOR 2025.<br>
+    Elaboração técnica: Analista &amp; Supervisor de Contratos — Dívida Pública · SEPLAN - MA<br>
     Valores em Reais (R$). Processamento local no navegador · <span id="footStamp">—</span>
   </div>
 </footer>
@@ -633,7 +749,7 @@ const SEED = JSON.parse($('#seed').textContent);
 const LS_DATA  = 'seplan.divida.base.v1';
 const LS_THEME = 'seplan.divida.tema.v1';
 let RAW = SEED, RAW_FROM_STORAGE = false;
-let ST = { ano:'', mes:'', tipo:'', credor:'', busca:'', sortK:3, sortDir:-1, page:1, pageSize:12 };
+let ST = { ano:'', mes:'', tipo:'', credor:'', busca:'', sortK:3, sortDir:-1, page:1, pageSize:12, cmp:[], gran:'quadrimestre', perMode:'saldo' };
 
 /* ------------------------------ normalização ---------------------------- */
 function normalize(raw){
@@ -735,7 +851,8 @@ function buildView(){
   }
 
   return { ms, refK, idxRef, rows, rowsRef, total, serieHist, serieProj, projSerie, delta, prevTotal,
-           pg, pgAno, anos, pgTotal, pgComp, proj, projMediaMes, filtered: !!(ST.tipo||ST.credor||q) };
+           pg, pgAno, anos, pgTotal, pgComp, proj, projMediaMes, match,
+           filtered: !!(ST.tipo||ST.credor||q) };
 }
 
 /* --------------------------- componentes de UI --------------------------- */
@@ -868,13 +985,21 @@ function renderLine(el, hist, proj, refK){
   const projPath = proj.length ? `<path d="M${X(ri).toFixed(1)},${Y(hist[ri].v).toFixed(1)} ${proj.map((p,i)=>`L${X(ri+1+i).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ')}"
       fill="none" stroke="${P.slate}" stroke-width="2.4" stroke-dasharray="6 5" stroke-linecap="round"/>` : '';
 
+  const PMset = partialMonths();
+  let firstPart = -1; hist.forEach((p,i)=>{ if(firstPart<0 && PMset[p.k]) firstPart = i; });
+  let tailPath = '';
+  if(firstPart > 0){
+    const t = hist.slice(firstPart-1);
+    tailPath = `<path d="${t.map((p,i)=>`${i?'L':'M'}${X(firstPart-1+i).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ')}"
+      fill="none" stroke="${P.orange}" stroke-width="2.2" stroke-dasharray="5 4" stroke-linecap="round"/>`;
+  }
   el.innerHTML = `<defs><linearGradient id="lgEvo" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="${P.blue}" stop-opacity=".26"/>
       <stop offset="100%" stop-color="${P.blue}" stop-opacity="0"/></linearGradient></defs>
     ${grid}
     <path d="${area}" fill="url(#lgEvo)"/>
-    <path d="${line(hist)}" fill="none" stroke="${P.blue}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-    ${projPath}${refMark}${xl}`;
+    <path d="${line(firstPart>0?hist.slice(0,firstPart):hist)}" fill="none" stroke="${P.blue}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+    ${tailPath}${projPath}${refMark}${xl}`;
   el.setAttribute('viewBox', `0 0 ${W} ${H}`);
 }
 
@@ -1009,13 +1134,210 @@ function render(){
   renderBarAno($('#barAno'), V.pgAno, V.anos);
   renderTable(V);
   renderNote(V);
+  renderCompare(V);
+  renderPeriod();
 
-  const ev = V.serieHist.length>1 ? (V.serieHist[V.serieHist.length-1].v - V.serieHist[0].v)/V.serieHist[0].v : 0;
+  const PM = partialMonths();
+  const solid = V.serieHist.filter(s=>!PM[s.k]);
+  const ev = solid.length>1 ? (solid[solid.length-1].v - solid[0].v)/solid[0].v : 0;
   const pill = $('#evoPill');
   pill.className = 'pill ' + (ev>=0?'up':'down');
-  pill.textContent = (ev>=0?'+':'') + pct(ev) + ' no período';
+  pill.textContent = (ev>=0?'+':'') + pct(ev) + ' no período' + (solid.length !== V.serieHist.length ? ' (exclui mês parcial)' : '');
 }
 function byTipoOf(V,k){ return V.rows.filter(r=>r[1]===k).reduce((s,r)=>s+r[2],0); }
+
+/* ==================== COMPARATIVO ENTRE COMPETÊNCIAS ==================== */
+const CMP_COLORS = () => { const P = palette(); return { INTERNA:P.blue, EXTERNA:P.orange, REESTRUTURACAO:P.slate }; };
+function mesLabel(k){
+  if(!k) return '—';
+  const [y,m] = k.split('-');
+  return MESES_LONGO[+m-1] + '/' + y.slice(2);
+}
+/* últimos N meses completos (até o mês de referência) */
+function defaultCmp(n){
+  const ms = monthsOf(RAW);
+  if(!ms.length) return [];
+  const ref = referenceMonth(RAW);
+  const idx = ms.indexOf(ref);
+  const upTo = idx>=0 ? ms.slice(0, idx+1) : ms;
+  return upTo.slice(Math.max(0, upTo.length-n));
+}
+function fillCompareSelects(){
+  const ms = monthsOf(RAW);
+  const host = $('#cmpSelects');
+  if(!host) return;
+  const n = ST.cmp.length || 4;
+  let html = '';
+  for(let i=0;i<n;i++){
+    html += `<div class="fl"><label for="cmpSel${i}">Competência ${i+1}</label>
+      <select class="cmp-sel" id="cmpSel${i}" data-i="${i}">` +
+      ms.map(k=>`<option value="${k}"${ST.cmp[i]===k?' selected':''}>${optLabel(k)}</option>`).join('') +
+      `</select></div>`;
+  }
+  host.innerHTML = html;
+  $$('.cmp-sel', host).forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      const i = +sel.dataset.i;
+      ST.cmp[i] = sel.value;
+      renderCompare(window.__V);
+    });
+  });
+}
+function monthRows(key, matchFn){
+  return ((RAW.estoque[key]||[]).filter(matchFn)).map(r=>[r[0], tipoKey(r[1]), +r[2]||0, credorOf(r[0])]);
+}
+function sparkMini(vals, color){
+  const w = 92, h = 26, p = 3.5;
+  if(vals.length < 2) return '';
+  const mx = Math.max.apply(null, vals), mn = Math.min.apply(null, vals);
+  const rng = (mx-mn) || 1;
+  const X = i => p + (w-2*p)*(i/(vals.length-1));
+  const Y = v => h-p - (h-2*p)*((v-mn)/rng);
+  const d = vals.map((v,i)=>`${i?'L':'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+  return `<svg class="cmp-sp" viewBox="0 0 ${w} ${h}" style="display:block" aria-hidden="true">
+    <path d="${d}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${X(vals.length-1).toFixed(1)}" cy="${Y(vals[vals.length-1]).toFixed(1)}" r="2.7" fill="${color}"/></svg>`;
+}
+function renderCompare(V){
+  if(!V) return;
+  const P = palette(), C = CMP_COLORS();
+  const ms = V.ms;
+  let keys = (ST.cmp||[]).filter(k=>ms.indexOf(k)>-1);
+  if(keys.length < 2) return;
+
+  /* dados por competência */
+  const per = keys.map(k=>{
+    const rows = monthRows(k, V.match);
+    const tot = rows.reduce((s,r)=>s+r[2],0);
+    const by = { INTERNA:0, EXTERNA:0, REESTRUTURACAO:0, OUTROS:0 };
+    rows.forEach(r=>{ if(by[r[1]]!==undefined) by[r[1]] += r[2]; });
+    const i = ms.indexOf(k);
+    const prevKey = i>0 ? ms[i-1] : null;
+    let prevTot = null;
+    if(prevKey) prevTot = monthRows(prevKey, V.match).reduce((s,r)=>s+r[2],0);
+    return { k, rows, tot, by, n: rows.length, prevKey, prevTot };
+  });
+
+  /* ---- cards resumo ---- */
+  $('#cmpCards').innerHTML = per.map((d,i)=>{
+    const delta = (d.prevTot!==null && d.prevTot) ? (d.tot - d.prevTot)/d.prevTot : null;
+    const dtxt = delta===null ? '—' : (delta>=0?'+':'') + pct(delta);
+    const dcls = delta===null ? 'gray' : (delta>=0?'up':'down');
+    const bar = ['INTERNA','EXTERNA','REESTRUTURACAO']
+      .filter(t=>d.by[t]>0)
+      .map(t=>`<i style="width:${(d.by[t]/(d.tot||1)*100).toFixed(2)}%;background:${C[t]}"></i>`).join('');
+    return `<div class="cmp-card">
+      <div class="cc-h"><span class="cc-m">${mesLabel(d.k)}</span>
+        <span class="cc-i">${i===0?'base':(i===keys.length-1?'atual':'')||('#'+(i+1))}</span></div>
+      <div class="cc-v">${compact(d.tot)}</div>
+      <div class="cc-b">
+        <div class="cc-r"><span class="pill ${dcls}" style="padding:1px 7px">${dtxt}</span>
+          <span style="font-weight:600">vs. ${d.prevKey?mesLabel(d.prevKey):'—'}</span></div>
+        <div class="stack">${bar}</div>
+        <div class="cc-r"><i style="background:${C.INTERNA}"></i>Interna<span class="v">${short(d.by.INTERNA)}</span></div>
+        <div class="cc-r"><i style="background:${C.EXTERNA}"></i>Externa<span class="v">${short(d.by.EXTERNA)}</span></div>
+        <div class="cc-r"><i style="background:${C.REESTRUTURACAO}"></i>Reestr.<span class="v">${short(d.by.REESTRUTURACAO)}</span></div>
+        <div class="cc-r" style="color:var(--muted)"><i style="background:var(--muted)"></i>Contratos<span class="v">${nf0.format(d.n)}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  /* ---- rodapé: variação do período ---- */
+  const first = per[0], last = per[per.length-1];
+  const varAbs = last.tot - first.tot;
+  const varPct = first.tot ? varAbs/first.tot : 0;
+  const vcls = varAbs>0 ? 'up' : (varAbs<0 ? 'down' : 'gray');
+  const vtxt = (varAbs>0?'+':'') + brl(varAbs) + '  (' + (varAbs>0?'+':'') + pct(varPct) + ')';
+  const nMeses = keys.length;
+  $('#cmpFoot').innerHTML =
+    `<span class="cf-l">Variação ${mesLabel(first.k)} → ${mesLabel(last.k)} (${nMeses} competências)</span>
+     <span class="pill ${vcls}" style="font-size:12px;padding:4px 11px">${vtxt}</span>
+     <span class="cf-l">Saldo final</span><span class="cf-v">${compact(last.tot)}</span>
+     <span class="cf-l">Média mensal do período</span><span class="cf-v">${compact(per.reduce((s,d)=>s+d.tot,0)/per.length)}</span>
+     <span class="cf-l">Máx / Mín</span><span class="cf-v">${short(Math.max.apply(null,per.map(d=>d.tot)))} / ${short(Math.min.apply(null,per.map(d=>d.tot)))}</span>`;
+
+  /* ---- tabela contrato x competência ---- */
+  const map = {};
+  per.forEach((d,ci)=>{
+    d.rows.forEach(r=>{
+      if(!map[r[0]]) map[r[0]] = { name:r[0], credor:r[3], tipo:r[1], vals:new Array(keys.length).fill(0) };
+      map[r[0]].vals[ci] += r[2];
+    });
+  });
+  let list = Object.keys(map).map(k=>map[k]);
+  list.forEach(o=>{
+    o.first = o.vals[0]; o.last = o.vals[o.vals.length-1];
+    o.dAbs = o.last - o.first;
+    o.dPct = o.first ? o.dAbs/o.first : (o.last>0 ? 1 : 0);
+    o.peak = Math.max.apply(null, o.vals);
+  });
+  list = list.filter(o=>o.peak>0);
+  list.sort((a,b)=>Math.abs(b.dAbs)-Math.abs(a.dAbs));
+
+  $('#cmpHead').innerHTML = `<th style="min-width:230px">Contrato / Operação</th>` +
+    keys.map(k=>`<th class="num">${mesLabel(k)}</th>`).join('') +
+    `<th class="num">Variação</th><th class="num">Δ %</th><th style="text-align:center">Tendência</th>`;
+
+  const firstIdx = 0, lastIdx = keys.length-1;
+  $('#tbodyCmp').innerHTML = list.length ? list.map(o=>{
+    const cls = o.dAbs>0 ? 'd-up' : (o.dAbs<0 ? 'd-down' : 'd-flat');
+    const cells = o.vals.map((v,i)=>{
+      const k = (i===firstIdx||i===lastIdx) ? ' hl' : '';
+      return `<td class="mcol${k}" title="${brl(v)}" style="${v===0?'opacity:.42':''}">${v===0?'—':short(v)}</td>`;
+    }).join('');
+    const col = o.dAbs>0 ? P.red : (o.dAbs<0 ? P.green : P.muted);
+    return `<tr>
+      <td class="strong" title="${esc(o.name)} · ${esc(o.credor)}">
+        <span class="cmp-dot" style="background:${C[o.tipo]||P.slate}"></span>${esc(o.name)}</td>
+      ${cells}
+      <td class="num ${cls}" title="${brl(o.dAbs)}">${(o.dAbs>0?'+':'')}${short(o.dAbs)}</td>
+      <td class="num ${cls}">${o.first?((o.dAbs>0?'+':'')+pct(o.dPct)):'novo'}</td>
+      <td style="text-align:center">${sparkMini(o.vals, col)}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="'+(keys.length+4)+'" style="text-align:center;color:var(--muted);padding:26px">Nenhum contrato corresponde aos filtros.</td></tr>';
+
+  $('#cmpFootRow').innerHTML = `<td>TOTAL FILTRADO</td>` +
+    per.map(d=>`<td class="num">${short(d.tot)}</td>`).join('') +
+    `<td class="num ${vcls}">${(varAbs>0?'+':'')}${short(varAbs)}</td>
+     <td class="num ${vcls}">${(varAbs>0?'+':'')}${pct(varPct)}</td><td></td>`;
+
+  /* botão base/atual nos cards */
+  $$('#cmpCards .cc-i').forEach((el,i)=>{
+    el.textContent = i===0 ? 'base' : (i===keys.length-1 ? 'atual' : '#'+(i+1));
+  });
+}
+function exportCmpCSV(){
+  const V = window.__V; if(!V) return;
+  const keys = (ST.cmp||[]).filter(k=>V.ms.indexOf(k)>-1);
+  if(keys.length<2){ toast('Selecione ao menos duas competências.', 'err'); return; }
+  const per = keys.map(k=>monthRows(k, V.match));
+  const map = {};
+  keys.forEach((k,ci)=>{
+    per[ci].forEach(r=>{
+      if(!map[r[0]]) map[r[0]] = { name:r[0], credor:r[3], vals:new Array(keys.length).fill(0) };
+      map[r[0]].vals[ci] += r[2];
+    });
+  });
+  const dec = v => nf2.format(v).replace(/\./g,'').replace(',','.');
+  const lines = [['Contrato','Credor'].concat(keys.map(mesLabel)).concat(['Variação (R$)','Δ %']).join(';')];
+  Object.values(map).sort((a,b)=>Math.abs(b.vals[keys.length-1]-b.vals[0])-Math.abs(a.vals[keys.length-1]-a.vals[0]))
+    .forEach(o=>{
+      const d = o.vals[keys.length-1]-o.vals[0];
+      const pc = o.vals[0] ? (d/o.vals[0]*100) : 0;
+      lines.push([`"${String(o.name).replace(/"/g,'""')}"`, `"${o.credor}"`]
+        .concat(o.vals.map(v=>dec(v)))
+        .concat([dec(d), pc.toFixed(2).replace('.',',')]).join(';'));
+    });
+  const tot = keys.map((k,ci)=>per[ci].reduce((s,r)=>s+r[2],0));
+  lines.push(['TOTAL',''].concat(tot.map(dec)).concat([dec(tot[tot.length-1]-tot[0]),
+    (tot[0]?(tot[tot.length-1]-tot[0])/tot[0]*100:0).toFixed(2).replace('.',',')]).join(';'));
+  const blob = new Blob(['\ufeff'+lines.join('\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `comparativo-divida-${keys[0]}_a_${keys[keys.length-1]}.csv`;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('Comparativo exportado ('+keys.length+' competências).', 'ok');
+}
 
 /* --------------------------- filtros / controles ------------------------- */
 function fillFilters(){
@@ -1029,8 +1351,11 @@ function fillFilters(){
   ST.ano = refAno; ST.mes = refMesN;
   selA.value = refAno;
   const mesesDoAno = ms.filter(k=>k.startsWith(refAno+'-')).map(k=>k.slice(5,7));
-  selM.innerHTML = mesesDoAno.map(mm=>`<option value="${mm}">${MESES_LONGO[+mm-1]} / ${refAno}</option>`).join('');
+  selM.innerHTML = mesesDoAno.map(mm=>`<option value="${mm}">${MESES_LONGO[+mm-1]} / ${refAno}${partialMonths()[refAno+'-'+mm]?' (parcial)':''}</option>`).join('');
   selM.value = refMesN;
+
+  if(!ST.cmp || !ST.cmp.length || ST.cmp.some(k=>ms.indexOf(k)===-1)) ST.cmp = defaultCmp(4);
+  fillCompareSelects();
 
   const creds = Array.from(new Set(Object.values(RAW.estoque).flat().map(r=>credorOf(r[0])))).sort();
   const selC = $('#fCredor');
@@ -1042,7 +1367,7 @@ function syncMonthOptions(){
   const ano = $('#fAno').value;
   const lista = ms.filter(k=>k.startsWith(ano+'-')).map(k=>k.slice(5,7));
   const keep = selM.value;
-  selM.innerHTML = lista.map(mm=>`<option value="${mm}">${MESES_LONGO[+mm-1]} / ${ano}</option>`).join('');
+  selM.innerHTML = lista.map(mm=>`<option value="${mm}">${MESES_LONGO[+mm-1]} / ${ano}${partialMonths()[ano+'-'+mm]?' (parcial)':''}</option>`).join('');
   selM.value = lista.indexOf(keep)>-1 ? keep : (lista[lista.length-1]||'');
 }
 function updateMeta(V){
@@ -1292,6 +1617,251 @@ function loadStored(){
   return null;
 }
 
+/* ============ MESES PARCIAIS (proteção contra quedas artificiais) ============ */
+function partialMonths(){
+  const ms = monthsOf(RAW);
+  const set = {};
+  if(!ms.length) return set;
+  const totals = ms.map(k=>(RAW.estoque[k]||[]).reduce((s,r)=>s+(+r[2]||0),0));
+  const mx = Math.max.apply(null, totals.concat([0]));
+  if(!mx) return set;
+  ms.forEach((k,i)=>{ if(totals[i] < mx*0.5) set[k] = true; });
+  return set;
+}
+function optLabel(k){
+  const PM = partialMonths();
+  return mesLabel(k) + (PM[k] ? ' ⚠' : '');
+}
+
+/* ================== ANÁLISE COMPARATIVA POR PERÍODO / ANO ================== */
+const GRAN = {
+  mes:          { label:'Mês',          sizes:Array(12).fill(1) },
+  bimestre:     { label:'Bimestre',     sizes:Array(6).fill(2) },
+  trimestre:    { label:'Trimestre',    sizes:Array(4).fill(3) },
+  quadrimestre: { label:'Quadrimestre', sizes:Array(3).fill(4) },
+  semestre:     { label:'Semestre',     sizes:Array(2).fill(6) },
+  ano:          { label:'Ano',          sizes:[12] }
+};
+const GRAN_SHORT = { mes:'Mês', bimestre:'Bim', trimestre:'Tri', quadrimestre:'Quad', semestre:'Sem', ano:'Ano' };
+function periodLabel(gran, i){
+  if(gran==='mes') return MESES_PT[i];
+  if(gran==='ano') return 'Ano';
+  return (i+1)+'º '+GRAN_SHORT[gran];
+}
+function periodBounds(gran, i){
+  const sizes = GRAN[gran].sizes;
+  let s = 0; for(let j=0;j<i;j++) s += sizes[j];
+  return [s+1, s+sizes[i]];
+}
+function yearColors(anos){
+  const P = palette();
+  const base = [P.blue, P.orange, P.slate, P.green, P.navy];
+  const m = {}; anos.forEach((a,i)=>{ m[a] = base[i % base.length]; }); return m;
+}
+function periodData(V){
+  const gran = ST.gran, mode = ST.perMode;
+  const anos = Array.from(new Set(V.ms.map(k=>k.slice(0,4)))).sort();
+  const nP = GRAN[gran].sizes.length;
+  const tot = {};
+  V.ms.forEach(k=>{ tot[k] = (RAW.estoque[k]||[]).filter(V.match).reduce((s,r)=>s+(+r[2]||0),0); });
+  const cell = (ano, i)=>{
+    const bd = periodBounds(gran, i), a = bd[0], b = bd[1];
+    const inside = V.ms.filter(k=>k.startsWith(ano+'-')).filter(k=>{ const m = +k.slice(5,7); return m>=a && m<=b; });
+    if(!inside.length) return null;
+    const last = inside[inside.length-1];
+    const saldo = tot[last] || 0;
+    let pm = a-1, py = +ano; if(pm<1){ pm = 12; py -= 1; }
+    const prevKey = py+'-'+String(pm).padStart(2,'0');
+    const base = (tot[prevKey]!==undefined) ? tot[prevKey] : (tot[inside[0]]||0);
+    const varAbs = saldo - base;
+    return { saldo, varAbs, varPct: base ? varAbs/base : 0, last,
+             partial: inside.length < (b-a+1), nMeses: inside.length };
+  };
+  return { anos, nP, cell, tot, gran, mode };
+}
+function renderPeriod(){
+  const V = window.__V; if(!V) return;
+  const D = periodData(V);
+  const P = palette(), YC = yearColors(D.anos);
+  if(!D.anos.length){ $('#tbodyPer').innerHTML = '<tr><td>Sem dados.</td></tr>'; return; }
+  const lastAno = D.anos[D.anos.length-1];
+  const prevAno = D.anos.length>1 ? D.anos[D.anos.length-2] : null;
+
+  /* ---------- cabeçalho ---------- */
+  let head = `<th style="min-width:118px">Período</th>`;
+  D.anos.forEach(a=>{ head += `<th class="pnum">${a}${a===lastAno?' <span style="color:var(--blue)">●</span>':''}</th>`; });
+  if(prevAno) head += `<th class="pnum">Δ ${prevAno}→${lastAno}</th><th class="pnum">Δ %</th>`;
+  $('#perHead').innerHTML = head;
+
+  /* ---------- linhas ---------- */
+  let partialSeen = false;
+  const rowsHtml = [];
+  for(let i=0;i<D.nP;i++){
+    let bestVal = -Infinity;
+    D.anos.forEach(a=>{ const c = D.cell(a,i); if(c){ const v = D.mode==='saldo'?c.saldo:c.varAbs; if(v>bestVal) bestVal = v; } });
+    let tds = `<td class="strong">${esc(periodLabel(D.gran, i))}</td>`;
+    D.anos.forEach(a=>{
+      const c = D.cell(a,i);
+      if(!c){ tds += `<td class="pnum pcell" style="opacity:.35">—</td>`; return; }
+      if(c.partial) partialSeen = true;
+      if(D.mode === 'saldo'){
+        const isBest = Math.abs(c.saldo-bestVal) < 0.5;
+        tds += `<td class="pnum pcell${isBest?' best':''}${c.partial?' part':''}" title="${brl(c.saldo)} · ${c.last}">
+          <span class="pv">${short(c.saldo)}</span>
+          <span class="pd">${c.partial ? (c.nMeses+' de '+GRAN[D.gran].sizes[i]+' meses') : mesLabel(c.last)}</span></td>`;
+      } else {
+        const cl = c.varAbs>0?'d-up':(c.varAbs<0?'d-down':'d-flat');
+        const isBest = Math.abs(c.varAbs-bestVal) < 0.5;
+        tds += `<td class="pnum pcell${isBest?' best':''}${c.partial?' part':''}" title="${brl(c.varAbs)}">
+          <span class="pv ${cl}">${(c.varAbs>0?'+':'')}${short(c.varAbs)}</span>
+          <span class="pd ${cl}">${(c.varPct>0?'+':'')}${pct(c.varPct)}</span></td>`;
+      }
+    });
+    if(prevAno){
+      const cl = D.cell(lastAno,i), cp = D.cell(prevAno,i);
+      if(cl && cp){
+        const d = (D.mode==='saldo' ? cl.saldo-cp.saldo : cl.varAbs-cp.varAbs);
+        const base = D.mode==='saldo' ? cp.saldo : Math.abs(cp.varAbs);
+        const dp = base ? d/base : 0;
+        const cls = d>0?'d-up':(d<0?'d-down':'d-flat');
+        tds += `<td class="pnum ${cls}">${(d>0?'+':'')}${short(d)}</td><td class="pnum ${cls}">${base?((d>0?'+':'')+pct(dp)):'—'}</td>`;
+      } else tds += `<td class="pnum">—</td><td class="pnum">—</td>`;
+    }
+    rowsHtml.push(`<tr>${tds}</tr>`);
+  }
+  $('#tbodyPer').innerHTML = rowsHtml.join('');
+  $('#perPartial').classList.toggle('hidden', !partialSeen);
+  $('#perPartial').textContent = partialSeen
+    ? '* Períodos marcados com asterisco ainda estão incompletos na base — os valores refletem apenas os meses já carregados.'
+    : '';
+
+  /* ---------- rodapé ---------- */
+  let ft = `<td>TOTAL / FECHAMENTO</td>`;
+  D.anos.forEach(a=>{
+    let last = null;
+    for(let i=D.nP-1;i>=0;i--){ const c = D.cell(a,i); if(c){ last = c; break; } }
+    ft += `<td class="pnum pcol">${last?short(D.mode==='saldo'?last.saldo:last.varAbs):'—'}</td>`;
+  });
+  if(prevAno){
+    const lc = (()=>{ for(let i=D.nP-1;i>=0;i--){ const c=D.cell(lastAno,i); if(c) return c; } return null; })();
+    const pc = (()=>{ for(let i=D.nP-1;i>=0;i--){ const c=D.cell(prevAno,i); if(c) return c; } return null; })();
+    if(lc && pc){
+      const d = (D.mode==='saldo'?lc.saldo-pc.saldo:lc.varAbs-pc.varAbs);
+      const base = D.mode==='saldo'?pc.saldo:Math.abs(pc.varAbs);
+      const cls = d>0?'d-up':(d<0?'d-down':'d-flat');
+      ft += `<td class="pnum ${cls}">${(d>0?'+':'')}${short(d)}</td><td class="pnum ${cls}">${base?((d>0?'+':'')+pct(d/base)):'—'}</td>`;
+    } else ft += `<td class="pnum">—</td><td class="pnum">—</td>`;
+  }
+  $('#perFootRow').innerHTML = ft;
+
+  /* ---------- resumo ---------- */
+  const allVals = [];
+  D.anos.forEach(a=>{ for(let i=0;i<D.nP;i++){ const c = D.cell(a,i); if(c) allVals.push(D.mode==='saldo'?c.saldo:c.varAbs); } });
+  const mxV = allVals.length?Math.max.apply(null,allVals):0;
+  const mnV = allVals.length?Math.min.apply(null,allVals):0;
+  const lc2 = (()=>{ for(let i=D.nP-1;i>=0;i--){ const c=D.cell(lastAno,i); if(c) return c; } return null; })();
+  $('#perFoot').innerHTML =
+    `<span class="cf-l">Granularidade</span><span class="cf-v" style="font-size:13px">${GRAN[D.gran].label}</span>
+     <span class="cf-l">Anos comparados</span><span class="cf-v" style="font-size:13px">${D.anos.join(' · ')}</span>
+     <span class="cf-l">${D.mode==='saldo'?'Maior saldo':'Maior alta'}</span><span class="cf-v" style="font-size:13px">${short(mxV)}</span>
+     <span class="cf-l">${D.mode==='saldo'?'Menor saldo':'Maior queda'}</span><span class="cf-v" style="font-size:13px">${short(mnV)}</span>
+     ${lc2?`<span class="cf-l">Último fechamento (${lc2.last})</span><span class="cf-v" style="font-size:13px">${compact(D.mode==='saldo'?lc2.saldo:lc2.varAbs)}</span>`:''}`;
+
+  renderPeriodChart(D);
+}
+
+/* ---------- gráfico de barras agrupadas por período ---------- */
+function renderPeriodChart(D){
+  const el = $('#chartPer');
+  const P = palette(), YC = yearColors(D.anos);
+  const W = 760, H = 240, PL = 62, PR = 14, PT = 16, PB = 34;
+  const nP = D.nP, nA = D.anos.length;
+  const val = (c)=> D.mode==='saldo' ? c.saldo : c.varAbs;
+  const vals = [];
+  for(let i=0;i<nP;i++) D.anos.forEach(a=>{ const c = D.cell(a,i); if(c) vals.push(val(c)); });
+  if(!vals.length){ el.innerHTML = '<text x="20" y="40" class="axis">Sem dados para os filtros selecionados.</text>'; return; }
+  let mx = Math.max.apply(null, vals.concat([0])), mn = Math.min.apply(null, vals.concat([0]));
+  if(mx === mn){ mx = mx || 1; mn = 0; }
+  const pad = (mx-mn)*0.12; mx += pad; if(mn < 0) mn -= pad;
+  const Y = v => PT + (H-PT-PB) * (1 - (v-mn)/(mx-mn));
+  const bw = (W-PL-PR)/nP;
+  const inner = bw*0.78;
+  const barW = Math.max(3, (inner - (nA-1)*3) / nA);
+
+  let grid = '';
+  const steps = 4;
+  for(let g=0; g<=steps; g++){
+    const v = mn + (mx-mn)*g/steps, y = Y(v);
+    grid += `<line class="gline" x1="${PL}" y1="${y.toFixed(1)}" x2="${W-PR}" y2="${y.toFixed(1)}"/>
+             <text class="axis" x="${PL-8}" y="${(y+3).toFixed(1)}" text-anchor="end">${short(v)}</text>`;
+  }
+  if(mn < 0) grid += `<line x1="${PL}" y1="${Y(0).toFixed(1)}" x2="${W-PR}" y2="${Y(0).toFixed(1)}" stroke="${P.muted}" stroke-width="1.2" stroke-dasharray="3 3"/>`;
+
+  const y0 = Y(Math.max(0, mn));
+  let bars = '';
+  for(let i=0;i<nP;i++){
+    const cx = PL + bw*i + bw/2;
+    const x0 = cx - inner/2;
+    D.anos.forEach((a,ai)=>{
+      const c = D.cell(a,i); if(!c) return;
+      const v = val(c);
+      const x = x0 + ai*(barW+3);
+      const y = Y(Math.max(0, v));
+      const h = Math.abs(Y(v) - y0);
+      if(h < 0.5) return;
+      bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}"
+        fill="${YC[a]}" rx="2" opacity="${c.partial?'.55':'1'}"><title>${a} · ${periodLabel(D.gran,i)}: ${brl(v)}</title></rect>`;
+    });
+    const rot = nP > 6;
+    bars += `<text class="axis" x="${cx.toFixed(1)}" y="${H-26}" text-anchor="${rot?'end':'middle'}"
+      transform="${rot?`rotate(-45 ${cx.toFixed(1)} ${H-26})`:''}" style="font-size:10px">${esc(periodLabel(D.gran,i))}</text>`;
+  }
+  el.innerHTML = grid + bars;
+  el.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  $('#perLegend').innerHTML = D.anos.map(a=>`<span><i style="background:${YC[a]}"></i>${a}</span>`).join('') +
+    (D.mode==='saldo'
+      ? '<span style="color:var(--muted)">· altura = saldo no fim do período</span>'
+      : '<span style="color:var(--muted)">· altura = variação dentro do período (barras para baixo = redução)</span>');
+}
+
+/* ---------- CSV da matriz ---------- */
+function exportPerCSV(){
+  const V = window.__V; if(!V) return;
+  const D = periodData(V);
+  const dec = v => nf2.format(v).replace(/\./g,'').replace(',','.');
+  const head = ['Período'].concat(D.anos).concat(['Δ último vs anterior (R$)','Δ %']);
+  const lines = [head.join(';')];
+  const lastAno = D.anos[D.anos.length-1], prevAno = D.anos.length>1 ? D.anos[D.anos.length-2] : null;
+  const val = c => D.mode==='saldo' ? c.saldo : c.varAbs;
+  for(let i=0;i<D.nP;i++){
+    const row = [periodLabel(D.gran, i)];
+    D.anos.forEach(a=>{ const c = D.cell(a,i); row.push(c ? dec(val(c)) : ''); });
+    if(prevAno){
+      const cl = D.cell(lastAno,i), cp = D.cell(prevAno,i);
+      if(cl && cp){ const d = val(cl)-val(cp); const b = Math.abs(val(cp));
+        row.push(dec(d), (b?(d/b*100):0).toFixed(2).replace('.',',')); }
+      else row.push('','');
+    }
+    lines.push(row.join(';'));
+  }
+  const blob = new Blob(['\ufeff'+lines.join('\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `comparativo-${D.gran}-${D.anos[0]}_a_${lastAno}.csv`;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('Matriz comparativa exportada ('+GRAN[D.gran].label+').', 'ok');
+}
+
+/* ---------- controles segmentados ---------- */
+function buildSeg(){
+  const gs = [['mes','Mês'],['bimestre','Bimestre'],['trimestre','Trimestre'],['quadrimestre','Quadrimestre'],['semestre','Semestre'],['ano','Ano']];
+  $('#granSeg').innerHTML = gs.map(g=>`<button data-g="${g[0]}"${ST.gran===g[0]?' class="on"':''}>${g[1]}</button>`).join('');
+  const ms = [['saldo','Saldo no fim do período'],['var','Variação no período']];
+  $('#modoSeg').innerHTML = ms.map(m=>`<button data-m="${m[0]}"${ST.perMode===m[0]?' class="on"':''}>${m[1]}</button>`).join('');
+  $$('#granSeg button').forEach(b=> b.addEventListener('click', ()=>{ ST.gran = b.dataset.g; buildSeg(); renderPeriod(); }));
+  $$('#modoSeg button').forEach(b=> b.addEventListener('click', ()=>{ ST.perMode = b.dataset.m; buildSeg(); renderPeriod(); }));
+}
+
 /* ------------------------------- eventos -------------------------------- */
 function bind(){
   $('#fAno').addEventListener('change', ()=>{ ST.ano = $('#fAno').value; syncMonthOptions(); ST.mes = $('#fMes').value; ST.page=1; render(); updateMeta(window.__V); });
@@ -1335,6 +1905,9 @@ function bind(){
   });
 
   $('#btnExport').addEventListener('click', exportCSV);
+  $('#btnCmpCsv').addEventListener('click', exportCmpCSV);
+  $('#btnPerCsv').addEventListener('click', exportPerCSV);
+  buildSeg();
   $('#btnPrint').addEventListener('click', ()=> window.print());
   $('#btnRestore').addEventListener('click', ()=>{
     RAW = SEED; RAW_FROM_STORAGE = false;
